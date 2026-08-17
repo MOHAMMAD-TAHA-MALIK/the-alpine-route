@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Upcoming Expeditions</h2>
+
+{% for trek in treks %}
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+        <h3>{{ trek.title }}</h3>
+        <p><strong>Destination:</strong> {{ trek.destination }} | <strong>Date:</strong> {{ trek.date }} | <strong>Difficulty:</strong> {{ trek.get_difficulty_display }}</p>
+        <p><strong>Organized by:</strong> {{ trek.created_by.username }}</p>
+        <p><strong>Participants:</strong> {{ trek.participants.count }}</p>
+        
+        {% if user.is_authenticated %}
+            {% if user in trek.participants.all %}
+                <span>✓ You are signed up for this trek</span>
+            {% else %}
+                <a href="{% url 'join_trek' trek.pk %}">Join Trek</a>
+            {% endif %}
+        {% endif %}
+    </div>
+{% empty %}
+    <p>No upcoming treks available right now.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Alpine Route</title>
+</head>
+<body>
+    <nav>
+        <h1><a href="{% url 'trek_list' %}">The Alpine Route</a></h1>
+        <a href="{% url 'trek_list' %}">Upcoming Treks</a> |
+        {% if user.is_authenticated %}
+            <span>Welcome, {{ user.username }}!</span>
+            {% if user.is_staff %}
+                | <a href="{% url 'create_trek' %}">+ Add Trek (Guide)</a>
+            {% endif %}
+            | <a href="{% url 'change_password' %}">Change Password</a>
+            | <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+              </form>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a> |
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </nav>
+    <hr>
+    {% block content %}{% endblock %}
+</body>
+</html>
