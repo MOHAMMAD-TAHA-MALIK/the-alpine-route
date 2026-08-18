@@ -1,24 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Upcoming Expeditions</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-calendar-event text-primary me-2"></i>Upcoming Expeditions</h2>
+</div>
 
-{% for trek in treks %}
-    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-        <h3>{{ trek.title }}</h3>
-        <p><strong>Destination:</strong> {{ trek.destination }} | <strong>Date:</strong> {{ trek.date }} | <strong>Difficulty:</strong> {{ trek.get_difficulty_display }}</p>
-        <p><strong>Organized by:</strong> {{ trek.created_by.username }}</p>
-        <p><strong>Participants:</strong> {{ trek.participants.count }}</p>
-        
-        {% if user.is_authenticated %}
-            {% if user in trek.participants.all %}
-                <span>✓ You are signed up for this trek</span>
-            {% else %}
-                <a href="{% url 'join_trek' trek.pk %}">Join Trek</a>
-            {% endif %}
-        {% endif %}
+{% if treks %}
+    <div class="row g-4">
+        {% for trek in treks %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="fw-bold card-title mb-0">{{ trek.title }}</h5>
+                                <span class="badge bg-info text-dark text-capitalize">{{ trek.get_difficulty_display }}</span>
+                            </div>
+                            <p class="text-secondary small mb-3">
+                                <i class="bi bi-geo-alt-fill me-1"></i>{{ trek.destination }}<br>
+                                <i class="bi bi-calendar-event me-1"></i>{{ trek.date|date:"M j, Y" }}
+                            </p>
+                            <p class="small text-muted mb-2">
+                                <strong>Organized by:</strong> {{ trek.created_by.username }}<br>
+                                <strong>Participants:</strong> {{ trek.participants.count }} / {{ trek.max_participants }}
+                            </p>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-top">
+                            {% if user.is_authenticated %}
+                                {% if user in trek.participants.all %}
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-success small fw-bold"><i class="bi bi-check-circle-fill me-1"></i>Signed Up</span>
+                                        <form action="{% url 'leave_trek' trek.pk %}" method="post" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Leave</button>
+                                        </form>
+                                    </div>
+                                {% elif trek.is_full %}
+                                    <button class="btn btn-sm btn-secondary rounded-pill w-100" disabled>Trek Full</button>
+                                {% else %}
+                                    <form action="{% url 'join_trek' trek.pk %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-primary rounded-pill w-100 fw-bold">Join Trek</button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-primary rounded-pill w-100">Log in to Join</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
-{% empty %}
-    <p>No upcoming treks available right now.</p>
-{% endfor %}
+{% else %}
+    <div class="alert alert-info rounded-4 p-4 text-center">
+        <p class="mb-0">No upcoming treks available right now. Check back soon!</p>
+    </div>
+{% endif %}
 {% endblock %}

@@ -1,6 +1,3 @@
-from django.test import TestCase
-
-# Create your tests here.
 from datetime import date, timedelta
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
@@ -51,13 +48,13 @@ class TrekEventModelTest(TestCase):
             title="Past Summit",
             description="Historical hike",
             date=timezone.now().date() - timedelta(days=5),
-            location="High Peak"
+            destination="High Peak"  # Fixed: location -> destination
         )
         self.future_event = TrekEvent.objects.create(
             title="Future Expedition",
             description="Upcoming climb",
             date=timezone.now().date() + timedelta(days=5),
-            location="Ridge Line"
+            destination="Ridge Line"  # Fixed: location -> destination
         )
 
     def test_is_past_method(self):
@@ -87,7 +84,8 @@ class TrekFormsTest(TestCase):
             'title': 'Forest Hike',
             'destination': 'Greenwood',
             'date': date.today() + timedelta(days=3),
-            'difficulty': 'easy'
+            'difficulty': 'easy',
+            'max_participants': 10
         }
         form = TrekForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -95,9 +93,9 @@ class TrekFormsTest(TestCase):
     def test_trek_event_form_valid(self):
         form_data = {
             'title': 'Sunset Walk',
+            'destination': 'Meadow Overlook',  # Fixed: location -> destination
             'description': 'Relaxing evening trail.',
-            'date': date.today(),
-            'location': 'Meadow Overlook'
+            'date': date.today()
         }
         form = TrekEventForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -133,16 +131,17 @@ class TrekViewsTest(TestCase):
             title="Community Meetup",
             description="Discussing equipment.",
             date=date.today(),
-            location="Clubhouse"
+            destination="Clubhouse"  # Fixed: location -> destination
         )
 
     # --- Auth & Profile ---
 
     def test_register_view(self):
-        response = self.client.get(reverse('signup'))
+        # Fixed: signup -> register
+        response = self.client.get(reverse('register'))
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(reverse('signup'), {
+        response = self.client.post(reverse('register'), {
             'username': 'newuser123',
             'password1': 'StrongPassword123!',
             'password2': 'StrongPassword123!'
@@ -162,10 +161,10 @@ class TrekViewsTest(TestCase):
         response = self.client.get(reverse('create_trek'))
         self.assertRedirects(response, f"/login/?next={reverse('create_trek')}")
 
-        # Regular non-staff user forbidden/redirected by user_passes_test
+        # Regular non-staff user redirected to trek_list per user_passes_test(..., login_url='trek_list')
         self.client.login(username='regular_user', password='password123')
         response = self.client.get(reverse('create_trek'))
-        self.assertNotEqual(response.status_code, 200)
+        self.assertRedirects(response, reverse('trek_list'))
 
         # Staff/Guide user allowed access
         self.client.login(username='guide', password='password123')
