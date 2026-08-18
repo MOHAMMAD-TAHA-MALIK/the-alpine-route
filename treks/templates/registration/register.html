@@ -1,5 +1,35 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Join The Alpine Route</h2>
-<form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">Register</button></form>
+<div class="row justify-content-center my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-4">
+                <h2 class="fw-bold mb-4 text-center">Sign Up</h2>
+
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <p class="mb-1"><strong>Please fix the errors below:</strong></p>
+                        {{ form.errors }}
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="{% url 'signup' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        {{ form.as_p }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Create Account</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <span class="text-secondary">Already have an account?</span> 
+                    <a href="{% url 'login' %}" class="text-decoration-none fw-bold">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
