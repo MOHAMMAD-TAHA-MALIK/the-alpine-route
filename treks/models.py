@@ -16,6 +16,9 @@ class Trek(models.Model):
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='moderate')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_treks')
     participants = models.ManyToManyField(User, related_name='joined_treks', blank=True)
+    @property
+    def is_full(self):
+        return self.participants.count() >= self.max_participants
 
     def __str__(self):
         return f"{self.title} ({self.date})"
@@ -48,3 +51,11 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} on {self.trek.title}"
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    bio = models.TextField(blank=True, max_length=500)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    emergency_contact = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"

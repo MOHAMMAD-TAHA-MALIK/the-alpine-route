@@ -1,0 +1,75 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-lg-10">
+        
+        <!-- User Info Card -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-body-tertiary">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-2" style="width: 70px; height: 70px;">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-1">{{ user.username }}</h2>
+                    <p class="text-secondary mb-0"><i class="bi bi-envelope me-1"></i>{{ user.email|default:"No email provided" }}</p>
+                    <span class="badge bg-secondary mt-1">Joined {{ user.date_joined|date:"F Y" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Joined Treks Section -->
+        <h3 class="fw-bold mb-3"><i class="bi bi-compass me-2 text-primary"></i>My Joined Expeditions ({{ joined_treks.count }})</h3>
+
+        {% if joined_treks %}
+            <div class="row g-3 mb-5">
+                {% for trek in joined_treks %}
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm rounded-4">
+                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="fw-bold card-title mb-0">{{ trek.title }}</h5>
+                                        <span class="badge bg-info text-dark text-capitalize">{{ trek.get_difficulty_display }}</span>
+                                    </div>
+                                    <p class="text-secondary mb-2">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>{{ trek.destination }} | 
+                                        <i class="bi bi-calendar-event me-1"></i>{{ trek.date|date:"M j, Y" }}
+                                    </p>
+                                </div>
+                                <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+                                    <small class="text-secondary">Organized by {{ trek.created_by.username }}</small>
+                                    <a href="{% url 'trek_list' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Feed</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info rounded-4 p-4 mb-5">
+                <p class="mb-2">You haven't signed up for any treks yet.</p>
+                <a href="{% url 'trek_list' %}" class="btn btn-primary rounded-pill btn-sm">Browse Treks</a>
+            </div>
+        {% endif %}
+
+        <!-- Optional: Staff/Guide Section for Created Treks -->
+        {% if user.is_staff and created_treks %}
+            <h3 class="fw-bold mb-3"><i class="bi bi-journal-plus me-2 text-warning"></i>Treks You Organized ({{ created_treks.count }})</h3>
+            <div class="list-group shadow-sm rounded-4 mb-4">
+                {% for trek in created_treks %}
+                    <div class="list-group-item p-3 border-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="fs-5">{{ trek.title }}</strong>
+                            <div class="text-secondary small">{{ trek.destination }} — {{ trek.date|date:"M j, Y" }}</div>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ trek.participants.count }} Participants</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

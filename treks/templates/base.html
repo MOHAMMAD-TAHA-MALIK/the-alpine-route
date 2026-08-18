@@ -27,12 +27,24 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'previous_treks' %}"><i class="bi bi-journal-check me-1"></i>Previous Treks</a>
                     </li>
+
+                    <!-- Staff/Guide Only: Create Trek Link -->
+                    {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link text-warning fw-bold" href="{% url 'create_trek' %}">
+                                <i class="bi bi-plus-circle-fill me-1"></i>Create Trek
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
+
                 <ul class="navbar-nav ms-auto align-items-center gap-2">
                     {% if user.is_authenticated %}
-                        <!-- Logged In State: Shows ONLY Username & Logout -->
+                        <!-- Logged In State: Shows Profile Link & Logout -->
                         <li class="nav-item">
-                            <span class="nav-link text-light me-2">Hi, <strong>{{ user.username }}</strong></span>
+                            <a class="nav-link text-light me-2" href="{% url 'profile' %}">
+                                <i class="bi bi-person-circle me-1"></i><strong>{{ user.username }}</strong>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <form action="{% url 'logout' %}" method="post" class="d-inline">

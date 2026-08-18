@@ -1,5 +1,5 @@
 from django import forms
-from .models import Trek
+
 from .models import Trek, TrekEvent
 
 class TrekEventForm(forms.ModelForm):

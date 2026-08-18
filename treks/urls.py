@@ -25,4 +25,6 @@ urlpatterns = [
 
 
     path('event/new/', views.create_trek_event, name='create_trek_event'),
+    path('trek/<int:pk>/leave/', views.leave_trek, name='leave_trek'),
+    path('profile/', views.profile, name='profile'),
 ]
