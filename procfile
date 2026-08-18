@@ -1,0 +1,1 @@
+web: gunicorn trek_club.wsgi:application
