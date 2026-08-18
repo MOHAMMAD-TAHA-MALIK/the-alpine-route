@@ -87,12 +87,13 @@ LOGIN_URL = 'login'
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Updated Storage configuration for Django + Cloudinary + WhiteNoise
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudBinaryStorage" if os.environ.get('CLOUDINARY_CLOUD_NAME') else "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage", # Non-strict manifest backend
     },
 }
 
