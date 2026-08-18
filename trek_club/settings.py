@@ -40,7 +40,8 @@ ROOT_URLCONF = 'trek_club.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.DjangoTemplates',
+        # Fixed: Updated path to include the 'django' sub-module
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'treks' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
