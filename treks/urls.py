@@ -9,7 +9,7 @@ urlpatterns = [
     path('previous/', views.previous_treks, name='previous_treks'),
 
     # Authentication & User Management
-    path('register/', views.register, name='register'),
+    path('register/', views.register, name='signup'),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('password-change/', views.change_password, name='change_password'),
