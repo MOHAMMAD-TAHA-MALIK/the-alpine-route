@@ -1,24 +1,25 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
+from django.utils import timezone
 
 from .models import Trek, TrekEvent, Comment
 from .forms import TrekForm
 
 
-def trek_list(request):
-    treks = Trek.objects.all().order_by('date')
-    return render(request, 'treks/trek_list.html', {'treks': treks})
-
+# --- Authentication Views ---
 
 def register(request):
+    """User registration view with success message."""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.success(request, f"Welcome to The Alpine Route, {user.username}!")
             return redirect('trek_list')
     else:
         form = UserCreationForm()
@@ -27,16 +28,20 @@ def register(request):
 
 @login_required
 def change_password(request):
+    """Allows authenticated users to change their password."""
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
+            messages.success(request, "Your password was successfully updated!")
             return redirect('trek_list')
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'registration/change_password.html', {'form': form})
 
+
+# --- Trek Planning Views ---
 
 def is_guide(user):
     return user.is_staff
@@ -45,12 +50,14 @@ def is_guide(user):
 @login_required
 @user_passes_test(is_guide)
 def create_trek(request):
+    """Guide-only view to create upcoming treks."""
     if request.method == 'POST':
         form = TrekForm(request.POST)
         if form.is_valid():
             trek = form.save(commit=False)
             trek.created_by = request.user
             trek.save()
+            messages.success(request, "Trek created successfully!")
             return redirect('trek_list')
     else:
         form = TrekForm()
@@ -60,12 +67,46 @@ def create_trek(request):
 @login_required
 @require_POST
 def join_trek(request, pk):
+    """Allows logged-in users to sign up as a participant for a Trek."""
     trek = get_object_or_404(Trek, pk=pk)
     trek.participants.add(request.user)
+    messages.success(request, f"You have joined {trek.title}!")
     return redirect('trek_list')
 
 
+# --- Trek Event Feed & Community Views ---
+
+def trek_list(request):
+    """Main feed displaying all trek events and planned treks."""
+    treks = Trek.objects.all().order_by('date')
+    events = TrekEvent.objects.all().order_by('-date')
+    return render(
+        request,
+        'treks/trek_list.html',
+        {
+            'treks': treks,
+            'events': events,
+            'title': 'All Treks',
+        },
+    )
+
+
+def upcoming_treks(request):
+    """Shows only upcoming trek events."""
+    today = timezone.now().date()
+    events = TrekEvent.objects.filter(date__gte=today).order_by('date')
+    return render(request, 'treks/trek_list.html', {'events': events, 'title': 'Upcoming Events'})
+
+
+def previous_treks(request):
+    """Shows past trek events log."""
+    today = timezone.now().date()
+    events = TrekEvent.objects.filter(date__lt=today).order_by('-date')
+    return render(request, 'treks/trek_list.html', {'events': events, 'title': 'Previous Treks Log'})
+
+
 def trek_detail(request, pk):
+    """Detailed single trek event page showing total likes and comments."""
     event = get_object_or_404(TrekEvent, pk=pk)
     is_liked = (
         event.likes.filter(id=request.user.id).exists()
@@ -86,6 +127,7 @@ def trek_detail(request, pk):
 @login_required
 @require_POST
 def like_event(request, pk):
+    """Toggle likes on a trek event."""
     event = get_object_or_404(TrekEvent, pk=pk)
     if event.likes.filter(id=request.user.id).exists():
         event.likes.remove(request.user)
@@ -97,8 +139,10 @@ def like_event(request, pk):
 @login_required
 @require_POST
 def add_comment(request, pk):
+    """Add a user comment to a trek event."""
     event = get_object_or_404(TrekEvent, pk=pk)
     content = request.POST.get('content', '').strip()
     if content:
         Comment.objects.create(trek=event, user=request.user, content=content)
+        messages.success(request, "Comment posted successfully!")
     return redirect('trek_detail', pk=pk)

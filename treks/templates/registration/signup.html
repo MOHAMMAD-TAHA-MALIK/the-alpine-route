@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="fw-bold mb-4 text-center"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Join The Club</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" class="form-control rounded-3" required>
+                            {% if field.help_text %}
+                                <div class="form-text text-muted" style="font-size: 0.8rem;">{{ field.help_text|safe }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold mt-3">Sign Up</button>
+                </form>
+                <div class="text-center mt-4">
+                    <span class="text-secondary">Already have an account?</span> 
+                    <a href="{% url 'login' %}" class="fw-bold text-decoration-none">Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,7 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 
 class Trek(models.Model):
     DIFFICULTY_CHOICES = [
@@ -22,23 +21,24 @@ class Trek(models.Model):
         return f"{self.title} ({self.date})"
 
 
-
-
-
 class TrekEvent(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    date = models.DateTimeField()
+    date = models.DateField()
     location = models.CharField(max_length=200)
     image = models.ImageField(upload_to='treks/', blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='trek_likes', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def is_past(self):
+        return self.date < timezone.now().date()
+
     def total_likes(self):
         return self.likes.count()
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.date})"
+
 
 class Comment(models.Model):
     trek = models.ForeignKey(TrekEvent, related_name='comments', on_delete=models.CASCADE)
@@ -47,4 +47,4 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.trek.title}"
+        return f"{self.user.username} on {self.trek.title}"

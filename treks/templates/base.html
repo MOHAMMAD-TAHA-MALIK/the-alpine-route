@@ -7,19 +7,6 @@
     <!-- Bootstrap 5.3 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        .card-img-top {
-            height: 220px;
-            object-fit: cover;
-        }
-        .hero-banner {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80');
-            background-size: cover;
-            background-position: center;
-            border-radius: 1rem;
-            color: white;
-        }
-    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -33,29 +20,39 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'trek_list' %}">Events</a>
+                        <a class="nav-link" href="{% url 'upcoming_treks' %}"><i class="bi bi-calendar-event me-1"></i>Upcoming Events</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'previous_treks' %}"><i class="bi bi-journal-check me-1"></i>Previous Treks</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
                     {% if user.is_authenticated %}
+                        <!-- Logged In State: Shows ONLY Username & Logout -->
                         <li class="nav-item">
-                            <span class="nav-link text-light">Hi, <strong>{{ user.username }}</strong></span>
+                            <span class="nav-link text-light me-2">Hi, <strong>{{ user.username }}</strong></span>
                         </li>
                         <li class="nav-item">
                             <form action="{% url 'logout' %}" method="post" class="d-inline">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                                <button type="submit" class="btn btn-outline-light btn-sm rounded-pill px-3">Logout</button>
                             </form>
                         </li>
                     {% else %}
+                        <!-- Logged Out State: Shows Login & Signup -->
                         <li class="nav-item">
-                            <a class="btn btn-light btn-sm fw-semibold" href="{% url 'login' %}">Login</a>
+                            <a class="btn btn-outline-light btn-sm rounded-pill px-3" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-light btn-sm text-primary fw-bold rounded-pill px-3" href="{% url 'signup' %}">Sign Up</a>
                         </li>
                     {% endif %}
                     
                     <!-- Dark/Light Theme Toggle Switch -->
-                    <li class="nav-item ms-lg-3">
-                        <button class="btn btn-sm btn-outline-light" id="themeToggle" onclick="toggleTheme()">
+                    <li class="nav-item ms-lg-2">
+                        <button class="btn btn-sm btn-outline-light rounded-circle" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
                             <i class="bi bi-sun-fill" id="themeIcon"></i>
                         </button>
                     </li>
@@ -66,6 +63,15 @@
 
     <!-- Main Content -->
     <main class="container my-4 flex-grow-1">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
 
@@ -97,7 +103,6 @@
             }
         }
 
-        // Preserve theme preference across pages
         (function() {
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
