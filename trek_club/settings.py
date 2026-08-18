@@ -19,9 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-   
     'django.contrib.staticfiles',
-     'cloudinary_storage',
+    'cloudinary_storage',
     'cloudinary',
     'treks',
 ]
@@ -41,7 +40,7 @@ ROOT_URLCONF = 'trek_club.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'django.template.backends.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'treks' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -87,15 +86,29 @@ LOGIN_URL = 'login'
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-# Updated Storage configuration for Django + Cloudinary + WhiteNoise
+
+# Cloudinary Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+}
+
+# Storage configuration for Django + Cloudinary + WhiteNoise
+IS_CLOUDINARY_ACTIVE = bool(os.environ.get('CLOUDINARY_CLOUD_NAME'))
+
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudBinaryStorage" if os.environ.get('CLOUDINARY_CLOUD_NAME') else "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage" if IS_CLOUDINARY_ACTIVE else "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage", # Non-strict manifest backend
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+
+if not IS_CLOUDINARY_ACTIVE:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -108,30 +121,14 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', '')
 
-# Cloudinary Configuration
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
-}
-
-# Safe Media Storage Fallback
-if os.environ.get('CLOUDINARY_CLOUD_NAME'):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudBinaryStorage'
-else:
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
-
-
-# Enable HTTPS Proxy Header recognition for Render
+# Enable HTTPS Proxy Header recognition & Trust Render domains
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Trust Render domain for incoming POST forms (CSRF protection)
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
     'https://the-alpine-route.onrender.com',
 ]
 
-# Ensure session & CSRF cookies are transmitted securely over HTTPS
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Enable secure HTTPS cookies in production, but allow HTTP during local development
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG

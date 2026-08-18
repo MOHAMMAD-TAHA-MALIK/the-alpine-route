@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Trek(models.Model):
@@ -16,6 +18,8 @@ class Trek(models.Model):
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='moderate')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_treks')
     participants = models.ManyToManyField(User, related_name='joined_treks', blank=True)
+    max_participants = models.PositiveIntegerField(default=15)  # <-- ADDED THIS
+
     @property
     def is_full(self):
         return self.participants.count() >= self.max_participants
@@ -51,6 +55,8 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} on {self.trek.title}"
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(blank=True, max_length=500)
@@ -59,3 +65,11 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+
+# Automatically create or save UserProfile whenever a User is created/updated
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+    instance.profile.save()

@@ -7,10 +7,10 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 
 from .models import Trek, TrekEvent, Comment
-from .forms import TrekForm
+from .forms import TrekForm, TrekEventForm
 
 
-# --- Authentication Views ---
+# --- Authentication & User Profile Views ---
 
 def register(request):
     """User registration view with success message."""
@@ -41,7 +41,19 @@ def change_password(request):
     return render(request, 'registration/change_password.html', {'form': form})
 
 
-# --- Trek Planning Views ---
+@login_required
+def profile(request):
+    """Displays the user's profile and their joined/created treks."""
+    joined_treks = request.user.joined_treks.all().order_by('date')
+    created_treks = request.user.created_treks.all().order_by('date')
+
+    return render(request, 'treks/profile.html', {
+        'joined_treks': joined_treks,
+        'created_treks': created_treks,
+    })
+
+
+# --- Trek Planning & Participation Views ---
 
 def is_guide(user):
     return user.is_staff
@@ -69,26 +81,46 @@ def create_trek(request):
 def join_trek(request, pk):
     """Allows logged-in users to sign up as a participant for a Trek."""
     trek = get_object_or_404(Trek, pk=pk)
-    trek.participants.add(request.user)
-    messages.success(request, f"You have joined {trek.title}!")
+    if trek.is_full:
+        messages.error(request, f"Sorry, {trek.title} is already at full capacity.")
+    else:
+        trek.participants.add(request.user)
+        messages.success(request, f"You have joined {trek.title}!")
+    return redirect('trek_list')
+
+
+@login_required
+@require_POST
+def leave_trek(request, pk):
+    """Allows logged-in users to remove themselves from a Trek."""
+    trek = get_object_or_404(Trek, pk=pk)
+    trek.participants.remove(request.user)
+    messages.info(request, f"You have left {trek.title}.")
     return redirect('trek_list')
 
 
 # --- Trek Event Feed & Community Views ---
 
 def trek_list(request):
-    """Main feed displaying all trek events and planned treks."""
+    """Main feed displaying all trek events and planned treks with search & filtering."""
+    query = request.GET.get('q', '').strip()
+    difficulty = request.GET.get('difficulty', '')
+
     treks = Trek.objects.all().order_by('date')
+
+    if query:
+        treks = treks.filter(destination__icontains=query)
+    if difficulty:
+        treks = treks.filter(difficulty=difficulty)
+
     events = TrekEvent.objects.all().order_by('-date')
-    return render(
-        request,
-        'treks/trek_list.html',
-        {
-            'treks': treks,
-            'events': events,
-            'title': 'All Treks',
-        },
-    )
+    return render(request, 'treks/trek_list.html', {
+        'treks': treks,
+        'events': events,
+        'title': 'All Treks',
+        'query': query,
+        'difficulty': difficulty,
+    })
 
 
 def upcoming_treks(request):
@@ -146,11 +178,12 @@ def add_comment(request, pk):
         Comment.objects.create(trek=event, user=request.user, content=content)
         messages.success(request, "Comment posted successfully!")
     return redirect('trek_detail', pk=pk)
-from .forms import TrekForm, TrekEventForm
+
 
 @login_required
 @user_passes_test(is_guide)
 def create_trek_event(request):
+    """Guide-only view to create a community event post."""
     if request.method == 'POST':
         form = TrekEventForm(request.POST, request.FILES)
         if form.is_valid():
@@ -160,41 +193,3 @@ def create_trek_event(request):
     else:
         form = TrekEventForm()
     return render(request, 'treks/event_form.html', {'form': form})
-@login_required
-@require_POST
-def leave_trek(request, pk):
-    trek = get_object_or_404(Trek, pk=pk)
-    trek.participants.remove(request.user)
-    messages.info(request, f"You have left {trek.title}.")
-    return redirect('trek_list')
-
-def trek_list(request):
-    query = request.GET.get('q', '').strip()
-    difficulty = request.GET.get('difficulty', '')
-
-    treks = Trek.objects.all().order_by('date')
-
-    if query:
-        treks = treks.filter(destination__icontains=query)
-    if difficulty:
-        treks = treks.filter(difficulty=difficulty)
-
-    events = TrekEvent.objects.all().order_by('-date')
-    return render(request, 'treks/trek_list.html', {
-        'treks': treks,
-        'events': events,
-        'title': 'All Treks',
-    })
-@login_required
-def profile(request):
-    """Displays the user's profile and their joined treks."""
-    # Fetches all treks that the logged-in user joined
-    joined_treks = request.user.joined_treks.all().order_by('date')
-    
-    # Optional: Fetches treks created by this user (if they are a staff/guide)
-    created_treks = request.user.created_treks.all().order_by('date')
-
-    return render(request, 'treks/profile.html', {
-        'joined_treks': joined_treks,
-        'created_treks': created_treks,
-    })
