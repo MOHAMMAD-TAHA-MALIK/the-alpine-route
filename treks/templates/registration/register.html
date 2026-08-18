@@ -14,7 +14,8 @@
                     </div>
                 {% endif %}
 
-                <form method="POST" action="{% url 'signup' %}">
+                <!-- FIX: Changed 'signup' to 'register' on the line below -->
+                <form method="POST" action="{% url 'register' %}">
                     {% csrf_token %}
                     
                     <div class="mb-3">
