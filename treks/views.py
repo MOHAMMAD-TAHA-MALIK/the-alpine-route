@@ -146,3 +146,17 @@ def add_comment(request, pk):
         Comment.objects.create(trek=event, user=request.user, content=content)
         messages.success(request, "Comment posted successfully!")
     return redirect('trek_detail', pk=pk)
+from .forms import TrekForm, TrekEventForm
+
+@login_required
+@user_passes_test(is_guide)
+def create_trek_event(request):
+    if request.method == 'POST':
+        form = TrekEventForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Event posted successfully!")
+            return redirect('trek_list')
+    else:
+        form = TrekEventForm()
+    return render(request, 'treks/event_form.html', {'form': form})
