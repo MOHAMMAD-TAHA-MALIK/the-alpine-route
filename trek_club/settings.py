@@ -121,3 +121,17 @@ if os.environ.get('CLOUDINARY_CLOUD_NAME'):
 else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# Enable HTTPS Proxy Header recognition for Render
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Trust Render domain for incoming POST forms (CSRF protection)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://the-alpine-route.onrender.com',
+]
+
+# Ensure session & CSRF cookies are transmitted securely over HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
