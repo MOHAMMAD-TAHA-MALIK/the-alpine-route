@@ -10,4 +10,8 @@ urlpatterns = [
     path('password-change/', views.change_password, name='change_password'),
     path('trek/new/', views.create_trek, name='create_trek'),
     path('trek/<int:pk>/join/', views.join_trek, name='join_trek'),
+    
+    path('trek/<int:pk>/', views.trek_detail, name='trek_detail'),
+    path('trek/<int:pk>/like/', views.like_event, name='like_event'),
+    path('trek/<int:pk>/comment/', views.add_comment, name='add_comment'),
 ]
