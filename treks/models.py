@@ -18,7 +18,7 @@ class Trek(models.Model):
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='moderate')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_treks')
     participants = models.ManyToManyField(User, related_name='joined_treks', blank=True)
-    max_participants = models.PositiveIntegerField(default=15)  # <-- ADDED THIS
+    max_participants = models.PositiveIntegerField(default=15)
 
     @property
     def is_full(self):
@@ -28,12 +28,19 @@ class Trek(models.Model):
         return f"{self.title} ({self.date})"
 
 
+class TrekImage(models.Model):
+    trek = models.ForeignKey(Trek, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='trek_images/')
+
+    def __str__(self):
+        return f"Image for Trek: {self.trek.title}"
+
+
 class TrekEvent(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
-    location = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='treks/', blank=True, null=True)
+    destination = models.CharField(max_length=200)
     likes = models.ManyToManyField(User, related_name='trek_likes', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -45,6 +52,14 @@ class TrekEvent(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.date})"
+
+
+class TrekEventImage(models.Model):
+    event = models.ForeignKey(TrekEvent, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='event_images/')
+
+    def __str__(self):
+        return f"Image for Event: {self.event.title}"
 
 
 class Comment(models.Model):
@@ -67,7 +82,6 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s Profile"
 
 
-# Automatically create or save UserProfile whenever a User is created/updated
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:

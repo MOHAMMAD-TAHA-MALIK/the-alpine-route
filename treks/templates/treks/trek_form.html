@@ -15,7 +15,7 @@
                     </div>
                 {% endif %}
 
-                <form method="post" action="{% url 'create_trek' %}">
+                <form method="post" action="{% url 'create_trek' %}" enctype="multipart/form-data">
                     {% csrf_token %}
 
                     <div class="mb-3">
@@ -33,9 +33,15 @@
                         {{ form.date }}
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label for="{{ form.difficulty.id_for_label }}" class="form-label fw-semibold">Difficulty Level</label>
                         {{ form.difficulty }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.images.id_for_label }}" class="form-label fw-semibold">Upload Photos (Select up to 3)</label>
+                        {{ form.images }}
+                        <small class="text-secondary d-block mt-1">{{ form.images.help_text }}</small>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold">

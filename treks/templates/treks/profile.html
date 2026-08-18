@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -40,7 +39,10 @@
                                 </div>
                                 <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
                                     <small class="text-secondary">Organized by {{ trek.created_by.username }}</small>
-                                    <a href="{% url 'trek_list' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Feed</a>
+                                    <form action="{% url 'leave_trek' trek.pk %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Leave Trek</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -54,7 +56,7 @@
             </div>
         {% endif %}
 
-        <!-- Optional: Staff/Guide Section for Created Treks -->
+        <!-- Staff/Guide Section for Created Treks -->
         {% if user.is_staff and created_treks %}
             <h3 class="fw-bold mb-3"><i class="bi bi-journal-plus me-2 text-warning"></i>Treks You Organized ({{ created_treks.count }})</h3>
             <div class="list-group shadow-sm rounded-4 mb-4">
@@ -64,7 +66,7 @@
                             <strong class="fs-5">{{ trek.title }}</strong>
                             <div class="text-secondary small">{{ trek.destination }} — {{ trek.date|date:"M j, Y" }}</div>
                         </div>
-                        <span class="badge bg-primary rounded-pill">{{ trek.participants.count }} Participants</span>
+                        <span class="badge bg-primary rounded-pill">{{ trek.participants.count }} / {{ trek.max_participants }} Participants</span>
                     </div>
                 {% endfor %}
             </div>

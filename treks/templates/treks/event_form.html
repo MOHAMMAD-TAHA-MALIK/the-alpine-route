@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Event - The Alpine Route{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="fw-bold mb-4 text-center">
+                    <i class="bi bi-journal-plus text-primary me-2"></i>Post Community Event
+                </h2>
+
+                {% if form.errors %}
+                    <div class="alert alert-danger rounded-3 mb-4">
+                        Please correct the errors below and try again.
+                    </div>
+                {% endif %}
+
+                <!-- Important: enctype="multipart/form-data" allows image uploads -->
+                <form method="post" action="{% url 'create_trek_event' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">Event Title</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.destination.id_for_label }}" class="form-label fw-semibold">Location / Destination</label>
+                        {{ form.destination }}
+                        {% if form.destination.errors %}
+                            <div class="text-danger small mt-1">{{ form.destination.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.date.id_for_label }}" class="form-label fw-semibold">Event Date</label>
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                            <div class="text-danger small mt-1">{{ form.date.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Multi-image upload field (Staff only) -->
+                    <div class="mb-4">
+                        <label for="{{ form.images.id_for_label }}" class="form-label fw-semibold">Upload Event Photos</label>
+                        {{ form.images }}
+                        {% if form.images.help_text %}
+                            <small class="text-secondary d-block mt-1">{{ form.images.help_text }}</small>
+                        {% endif %}
+                        {% if form.images.errors %}
+                            <div class="text-danger small mt-1">{{ form.images.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2 rounded-pill fw-bold">
+                            <i class="bi bi-send-fill me-1"></i>Publish Event
+                        </button>
+                        <a href="{% url 'trek_list' %}" class="btn btn-outline-secondary py-2 rounded-pill fw-semibold">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

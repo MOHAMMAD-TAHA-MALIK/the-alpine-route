@@ -3,14 +3,47 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        {% if event.image %}
-            <img src="{{ event.image.url }}" class="img-fluid rounded-4 shadow mb-4 w-100" style="max-height: 400px; object-fit: cover;" alt="{{ event.title }}">
+
+        <!-- INSTAGRAM-STYLE CAROUSEL SLIDER -->
+        {% if event.images.all %}
+            <div id="eventCarousel{{ event.pk }}" class="carousel slide mb-4 shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
+                
+                <!-- Indicators (Dots) -->
+                {% if event.images.count > 1 %}
+                    <div class="carousel-indicators mb-2">
+                        {% for img in event.images.all %}
+                            <button type="button" data-bs-target="#eventCarousel{{ event.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}"></button>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Slides -->
+                <div class="carousel-inner">
+                    {% for img in event.images.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ img.image.url }}" class="d-block w-100" style="height: 420px; object-fit: cover;" alt="{{ event.title }}">
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Next/Prev Controls -->
+                {% if event.images.count > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#eventCarousel{{ event.pk }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-dark bg-opacity-50 rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#eventCarousel{{ event.pk }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-dark bg-opacity-50 rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                {% endif %}
+            </div>
         {% endif %}
 
+        <!-- Header & Like Action -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="fw-bold mb-0">{{ event.title }}</h1>
             
-            <!-- Like Button -->
             {% if user.is_authenticated %}
                 <form action="{% url 'like_event' event.pk %}" method="post">
                     {% csrf_token %}
@@ -23,30 +56,38 @@
             {% endif %}
         </div>
 
-        <p class="text-secondary"><i class="bi bi-geo-alt-fill me-1"></i> {{ event.location }} | <i class="bi bi-calendar-event me-1"></i> {{ event.date|date:"F j, Y" }}</p>
+        <p class="text-secondary mb-4">
+            <i class="bi bi-geo-alt-fill me-1 text-danger"></i>{{ event.destination }} | 
+            <i class="bi bi-calendar-event me-1 text-primary"></i>{{ event.date|date:"F j, Y" }}
+        </p>
 
-        <p class="fs-5 lead mt-4">{{ event.description }}</p>
+        {% if event.description %}
+            <div class="card border-0 bg-body-tertiary rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-2">About this Trek</h5>
+                <p class="mb-0 text-secondary">{{ event.description }}</p>
+            </div>
+        {% endif %}
 
         <hr class="my-5">
 
         <!-- Comments Section -->
-        <h3 class="fw-bold mb-4"><i class="bi bi-chat-left-text-fill me-2"></i>Comments ({{ event.comments.count }})</h3>
+        <h3 class="fw-bold mb-4"><i class="bi bi-chat-left-text-fill me-2 text-primary"></i>Comments ({{ event.comments.count }})</h3>
 
         {% if user.is_authenticated %}
             <form action="{% url 'add_comment' event.pk %}" method="post" class="mb-4">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <textarea name="content" class="form-control" rows="3" placeholder="Write a comment..." required></textarea>
+                    <textarea name="content" class="form-control rounded-3" rows="3" placeholder="Write a comment..." required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary px-4 rounded-pill">Post Comment</button>
+                <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold">Post Comment</button>
             </form>
         {% else %}
-            <div class="alert alert-info">
-                Please <a href="{% url 'login' %}">log in</a> to like or post a comment.
+            <div class="alert alert-info rounded-3">
+                Please <a href="{% url 'login' %}">log in</a> to like or comment on this event.
             </div>
         {% endif %}
 
-        <!-- Comment List -->
+        <!-- Comments Feed -->
         <div class="d-flex flex-column gap-3">
             {% for comment in event.comments.all %}
                 <div class="card border-0 shadow-sm rounded-3 bg-body-tertiary">
@@ -59,9 +100,10 @@
                     </div>
                 </div>
             {% empty %}
-                <p class="text-secondary">No comments yet. Be the first to share your thoughts!</p>
+                <p class="text-secondary">No comments yet. Be the first to join the discussion!</p>
             {% endfor %}
         </div>
+
     </div>
 </div>
 {% endblock %}

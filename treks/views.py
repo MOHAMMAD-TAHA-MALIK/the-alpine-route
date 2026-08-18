@@ -6,14 +6,18 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 
-from .models import Trek, TrekEvent, Comment
+from .models import Trek, TrekEvent, Comment, TrekImage, TrekEventImage
 from .forms import TrekForm, TrekEventForm
+
+
+# Guard function: strictly checks if user is authenticated staff
+def is_staff_user(user):
+    return user.is_authenticated and user.is_staff
 
 
 # --- Authentication & User Profile Views ---
 
 def register(request):
-    """User registration view with success message."""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -28,7 +32,6 @@ def register(request):
 
 @login_required
 def change_password(request):
-    """Allows authenticated users to change their password."""
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
@@ -43,9 +46,8 @@ def change_password(request):
 
 @login_required
 def profile(request):
-    """Displays the user's profile and their joined/created treks."""
-    joined_treks = request.user.joined_treks.all().order_by('date')
-    created_treks = request.user.created_treks.all().order_by('date')
+    joined_treks = request.user.joined_treks.all().prefetch_related('images').order_by('date')
+    created_treks = request.user.created_treks.all().prefetch_related('images').order_by('date')
 
     return render(request, 'treks/profile.html', {
         'joined_treks': joined_treks,
@@ -53,22 +55,24 @@ def profile(request):
     })
 
 
-# --- Trek Planning & Participation Views ---
-
-def is_guide(user):
-    return user.is_staff
-
+# --- Trek Planning & Event Creation (STAFF ONLY) ---
 
 @login_required
-@user_passes_test(is_guide)
+@user_passes_test(is_staff_user, login_url='trek_list')
 def create_trek(request):
-    """Guide-only view to create upcoming treks."""
+    """STAFF ONLY view to create upcoming treks with up to 3 images."""
     if request.method == 'POST':
-        form = TrekForm(request.POST)
+        form = TrekForm(request.POST, request.FILES)
         if form.is_valid():
             trek = form.save(commit=False)
             trek.created_by = request.user
             trek.save()
+
+            # Process up to 3 uploaded images via custom MultipleFileInput
+            images = request.FILES.getlist('images')
+            for img in images[:3]:
+                TrekImage.objects.create(trek=trek, image=img)
+
             messages.success(request, "Trek created successfully!")
             return redirect('trek_list')
     else:
@@ -77,9 +81,31 @@ def create_trek(request):
 
 
 @login_required
+@user_passes_test(is_staff_user, login_url='trek_list')
+def create_trek_event(request):
+    """STAFF ONLY view to create a community event post with up to 3 images."""
+    if request.method == 'POST':
+        form = TrekEventForm(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save()
+
+            # Process up to 3 uploaded images
+            images = request.FILES.getlist('images')
+            for img in images[:3]:
+                TrekEventImage.objects.create(event=event, image=img)
+
+            messages.success(request, "Event posted successfully!")
+            return redirect('trek_list')
+    else:
+        form = TrekEventForm()
+    return render(request, 'treks/event_form.html', {'form': form})
+
+
+# --- Participation & Community Actions (ALL USERS) ---
+
+@login_required
 @require_POST
 def join_trek(request, pk):
-    """Allows logged-in users to sign up as a participant for a Trek."""
     trek = get_object_or_404(Trek, pk=pk)
     if trek.is_full:
         messages.error(request, f"Sorry, {trek.title} is already at full capacity.")
@@ -92,28 +118,25 @@ def join_trek(request, pk):
 @login_required
 @require_POST
 def leave_trek(request, pk):
-    """Allows logged-in users to remove themselves from a Trek."""
     trek = get_object_or_404(Trek, pk=pk)
     trek.participants.remove(request.user)
     messages.info(request, f"You have left {trek.title}.")
     return redirect('trek_list')
 
 
-# --- Trek Event Feed & Community Views ---
-
 def trek_list(request):
-    """Main feed displaying all trek events and planned treks with search & filtering."""
     query = request.GET.get('q', '').strip()
     difficulty = request.GET.get('difficulty', '')
 
-    treks = Trek.objects.all().order_by('date')
+    treks = Trek.objects.prefetch_related('images', 'participants').all().order_by('date')
 
     if query:
         treks = treks.filter(destination__icontains=query)
     if difficulty:
         treks = treks.filter(difficulty=difficulty)
 
-    events = TrekEvent.objects.all().order_by('-date')
+    events = TrekEvent.objects.prefetch_related('images', 'likes').all().order_by('-date')
+    
     return render(request, 'treks/trek_list.html', {
         'treks': treks,
         'events': events,
@@ -124,22 +147,22 @@ def trek_list(request):
 
 
 def upcoming_treks(request):
-    """Shows only upcoming trek events."""
     today = timezone.now().date()
-    events = TrekEvent.objects.filter(date__gte=today).order_by('date')
+    events = TrekEvent.objects.prefetch_related('images').filter(date__gte=today).order_by('date')
     return render(request, 'treks/trek_list.html', {'events': events, 'title': 'Upcoming Events'})
 
 
 def previous_treks(request):
-    """Shows past trek events log."""
     today = timezone.now().date()
-    events = TrekEvent.objects.filter(date__lt=today).order_by('-date')
+    events = TrekEvent.objects.prefetch_related('images').filter(date__lt=today).order_by('-date')
     return render(request, 'treks/trek_list.html', {'events': events, 'title': 'Previous Treks Log'})
 
 
 def trek_detail(request, pk):
-    """Detailed single trek event page showing total likes and comments."""
-    event = get_object_or_404(TrekEvent, pk=pk)
+    event = get_object_or_404(
+        TrekEvent.objects.prefetch_related('images', 'comments__user', 'likes'), 
+        pk=pk
+    )
     is_liked = (
         event.likes.filter(id=request.user.id).exists()
         if request.user.is_authenticated
@@ -159,7 +182,6 @@ def trek_detail(request, pk):
 @login_required
 @require_POST
 def like_event(request, pk):
-    """Toggle likes on a trek event."""
     event = get_object_or_404(TrekEvent, pk=pk)
     if event.likes.filter(id=request.user.id).exists():
         event.likes.remove(request.user)
@@ -171,25 +193,12 @@ def like_event(request, pk):
 @login_required
 @require_POST
 def add_comment(request, pk):
-    """Add a user comment to a trek event."""
     event = get_object_or_404(TrekEvent, pk=pk)
     content = request.POST.get('content', '').strip()
     if content:
+        # Changed event=event to trek=event to align with Comment model's FK name
         Comment.objects.create(trek=event, user=request.user, content=content)
         messages.success(request, "Comment posted successfully!")
-    return redirect('trek_detail', pk=pk)
-
-
-@login_required
-@user_passes_test(is_guide)
-def create_trek_event(request):
-    """Guide-only view to create a community event post."""
-    if request.method == 'POST':
-        form = TrekEventForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Event posted successfully!")
-            return redirect('trek_list')
     else:
-        form = TrekEventForm()
-    return render(request, 'treks/event_form.html', {'form': form})
+        messages.error(request, "Comment cannot be empty.")
+    return redirect('trek_detail', pk=pk)
