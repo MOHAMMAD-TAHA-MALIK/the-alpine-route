@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}Create Trek - The Alpine Route{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center my-4">
     <div class="col-md-8 col-lg-6">
@@ -19,34 +21,77 @@
                     {% csrf_token %}
 
                     <div class="mb-3">
-                        <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">Trek Title</label>
+                        <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                            Trek Title
+                        </label>
                         {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
-                        <label for="{{ form.destination.id_for_label }}" class="form-label fw-semibold">Destination</label>
+                        <label for="{{ form.destination.id_for_label }}" class="form-label fw-semibold">
+                            Destination
+                        </label>
                         {{ form.destination }}
+                        {% if form.destination.errors %}
+                            <div class="text-danger small mt-1">{{ form.destination.errors }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
-                        <label for="{{ form.date.id_for_label }}" class="form-label fw-semibold">Expedition Date</label>
+                        <label for="{{ form.date.id_for_label }}" class="form-label fw-semibold">
+                            Expedition Date
+                        </label>
                         {{ form.date }}
+                        {% if form.date.errors %}
+                            <div class="text-danger small mt-1">{{ form.date.errors }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
-                        <label for="{{ form.difficulty.id_for_label }}" class="form-label fw-semibold">Difficulty Level</label>
+                        <label for="{{ form.difficulty.id_for_label }}" class="form-label fw-semibold">
+                            Difficulty Level
+                        </label>
                         {{ form.difficulty }}
+                        {% if form.difficulty.errors %}
+                            <div class="text-danger small mt-1">{{ form.difficulty.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- BUG 13 FIX: max_participants was missing entirely -->
+                    <div class="mb-3">
+                        <label for="{{ form.max_participants.id_for_label }}" class="form-label fw-semibold">
+                            Max Participants
+                        </label>
+                        {{ form.max_participants }}
+                        {% if form.max_participants.errors %}
+                            <div class="text-danger small mt-1">{{ form.max_participants.errors }}</div>
+                        {% endif %}
+                        <div class="form-text text-muted small">
+                            Maximum number of hikers allowed on this trek.
+                        </div>
                     </div>
 
                     <div class="mb-4">
-                        <label for="{{ form.images.id_for_label }}" class="form-label fw-semibold">Upload Photos (Select up to 3)</label>
+                        <label for="{{ form.images.id_for_label }}" class="form-label fw-semibold">
+                            Upload Photos <span class="text-muted fw-normal">(up to 3)</span>
+                        </label>
                         {{ form.images }}
                         <small class="text-secondary d-block mt-1">{{ form.images.help_text }}</small>
+                        {% if form.images.errors %}
+                            <div class="text-danger small mt-1">{{ form.images.errors }}</div>
+                        {% endif %}
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold">
                         <i class="bi bi-check-circle-fill me-1"></i>Publish Trek
                     </button>
+
+                    <a href="{% url 'trek_list' %}" class="btn btn-outline-secondary w-100 py-2 rounded-pill fw-semibold mt-2">
+                        Cancel
+                    </a>
                 </form>
             </div>
         </div>

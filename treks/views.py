@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.db.models import Exists, OuterRef
 
 from .models import Trek, TrekEvent, Comment, TrekImage, TrekEventImage
 from .forms import TrekForm, TrekEventForm
@@ -107,6 +108,12 @@ def create_trek_event(request):
 @require_POST
 def join_trek(request, pk):
     trek = get_object_or_404(Trek, pk=pk)
+    if trek.created_by == request.user:
+        messages.error(request, "You can't join a trek you organized.")
+        return redirect('trek_list')
+    if trek.participants.filter(pk=request.user.pk).exists():
+        messages.info(request, "You're already in this trek.")
+        return redirect('trek_list')
     if trek.is_full:
         messages.error(request, f"Sorry, {trek.title} is already at full capacity.")
     else:
@@ -128,7 +135,18 @@ def trek_list(request):
     query = request.GET.get('q', '').strip()
     difficulty = request.GET.get('difficulty', '')
 
-    treks = Trek.objects.prefetch_related('images', 'participants').all().order_by('date')
+    # Build the subquery ONLY if user is logged in
+    if request.user.is_authenticated:
+        user_joined_subquery = Trek.participants.through.objects.filter(
+            trek_id=OuterRef('pk'),
+            user_id=request.user.pk
+        )
+        treks = Trek.objects.prefetch_related('images', 'participants') \
+                            .annotate(user_has_joined=Exists(user_joined_subquery)) \
+                            .order_by('date')
+    else:
+        treks = Trek.objects.prefetch_related('images', 'participants') \
+                            .order_by('date')
 
     if query:
         treks = treks.filter(destination__icontains=query)
@@ -136,7 +154,7 @@ def trek_list(request):
         treks = treks.filter(difficulty=difficulty)
 
     events = TrekEvent.objects.prefetch_related('images', 'likes').all().order_by('-date')
-    
+
     return render(request, 'treks/trek_list.html', {
         'treks': treks,
         'events': events,
@@ -147,15 +165,23 @@ def trek_list(request):
 
 
 def upcoming_treks(request):
+    
     today = timezone.now().date()
-    events = TrekEvent.objects.prefetch_related('images').filter(date__gte=today).order_by('date')
-    return render(request, 'treks/trek_list.html', {'events': events, 'title': 'Upcoming Events'})
-
+    treks = Trek.objects.prefetch_related('images', 'participants') \
+                .filter(date__gte=today).order_by('date')
+    return render(request, 'treks/trek_list.html', {
+        'treks': treks,
+        'title': 'Upcoming Treks'
+    })
 
 def previous_treks(request):
     today = timezone.now().date()
-    events = TrekEvent.objects.prefetch_related('images').filter(date__lt=today).order_by('-date')
-    return render(request, 'treks/trek_list.html', {'events': events, 'title': 'Previous Treks Log'})
+    treks = Trek.objects.prefetch_related('images', 'participants') \
+                .filter(date__lt=today).order_by('-date')
+    return render(request, 'treks/trek_list.html', {
+        'treks': treks,
+        'title': 'Past Treks'
+    })
 
 
 def trek_detail(request, pk):
