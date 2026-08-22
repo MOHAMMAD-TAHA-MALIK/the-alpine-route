@@ -26,8 +26,30 @@ class MultipleFileInput(forms.FileInput):
         return files.get(name)
 
 
+class MultipleFileField(forms.FileField):
+    """
+    FIX: forms.FileField.to_python() only knows how to handle a single
+    UploadedFile. MultipleFileInput.value_from_datadict() returns a list
+    (via files.getlist()), so as soon as 1+ files were selected, to_python()
+    tried to read .name/.size off a list, hit an AttributeError, and Django
+    reported that as the generic "No file was submitted. Check the encoding
+    type on the form." error - even though enctype was set correctly all
+    along. This overrides clean() to run the normal FileField validation on
+    each file in the list individually instead of on the list as a whole.
+    """
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('widget', MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = forms.FileField.clean
+        if isinstance(data, (list, tuple)):
+            return [single_file_clean(self, d, initial) for d in data]
+        return single_file_clean(self, data, initial)
+
+
 class TrekForm(forms.ModelForm):
-    images = forms.FileField(
+    images = MultipleFileField(
         widget=MultipleFileInput(attrs={
             'class': 'form-control',
             'accept': 'image/*'
@@ -49,7 +71,7 @@ class TrekForm(forms.ModelForm):
 
 
 class TrekEventForm(forms.ModelForm):
-    images = forms.FileField(
+    images = MultipleFileField(
         widget=MultipleFileInput(attrs={
             'class': 'form-control',
             'accept': 'image/*'
