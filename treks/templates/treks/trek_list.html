@@ -40,7 +40,12 @@
     <div class="row g-4">
         {% for trek in treks %}
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    {% with trek.images.all|first as trek_image %}
+                        {% if trek_image %}
+                            <img src="{{ trek_image.image.url }}" class="w-100" style="height: 180px; object-fit: cover;" alt="{{ trek.title }}">
+                        {% endif %}
+                    {% endwith %}
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -113,7 +118,12 @@
     <div class="row g-4">
         {% for event in events %}
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    {% with event.images.all|first as event_image %}
+                        {% if event_image %}
+                            <img src="{{ event_image.image.url }}" class="w-100" style="height: 180px; object-fit: cover;" alt="{{ event.title }}">
+                        {% endif %}
+                    {% endwith %}
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
                             <h5 class="fw-bold mb-2">{{ event.title }}</h5>
