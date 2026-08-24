@@ -184,6 +184,23 @@ def previous_treks(request):
     })
 
 
+def trek_expedition_detail(request, pk):
+    """Detail page for a single Trek, including its full image gallery."""
+    trek = get_object_or_404(
+        Trek.objects.prefetch_related('images', 'participants'),
+        pk=pk
+    )
+    user_has_joined = (
+        trek.participants.filter(pk=request.user.pk).exists()
+        if request.user.is_authenticated
+        else False
+    )
+    return render(request, 'treks/trek_expedition_detail.html', {
+        'trek': trek,
+        'user_has_joined': user_has_joined,
+    })
+
+
 def trek_detail(request, pk):
     event = get_object_or_404(
         TrekEvent.objects.prefetch_related('images', 'comments__user', 'likes'), 

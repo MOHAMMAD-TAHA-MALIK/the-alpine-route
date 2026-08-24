@@ -43,13 +43,17 @@
                 <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
                     {% with trek.images.all|first as trek_image %}
                         {% if trek_image %}
-                            <img src="{{ trek_image.image.url }}" class="w-100" style="height: 180px; object-fit: cover;" alt="{{ trek.title }}">
+                            <a href="{% url 'trek_expedition_detail' trek.pk %}" class="d-block">
+                                <img src="{{ trek_image.image.url }}" class="d-block w-100" style="height: 180px; object-fit: cover;" alt="{{ trek.title }}">
+                            </a>
                         {% endif %}
                     {% endwith %}
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="fw-bold card-title mb-0">{{ trek.title }}</h5>
+                                <h5 class="fw-bold card-title mb-0">
+                                    <a href="{% url 'trek_expedition_detail' trek.pk %}" class="text-decoration-none text-dark">{{ trek.title }}</a>
+                                </h5>
                                 <span class="badge bg-info text-dark text-capitalize">
                                     {{ trek.get_difficulty_display }}
                                 </span>
@@ -121,7 +125,9 @@
                 <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
                     {% with event.images.all|first as event_image %}
                         {% if event_image %}
-                            <img src="{{ event_image.image.url }}" class="w-100" style="height: 180px; object-fit: cover;" alt="{{ event.title }}">
+                            <a href="{% url 'trek_detail' event.pk %}" class="d-block">
+                                <img src="{{ event_image.image.url }}" class="d-block w-100" style="height: 180px; object-fit: cover;" alt="{{ event.title }}">
+                            </a>
                         {% endif %}
                     {% endwith %}
                     <div class="card-body p-4 d-flex flex-column justify-content-between">

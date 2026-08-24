@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ trek.title }} - The Alpine Route{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <!-- IMAGE CAROUSEL -->
+        {% if trek.images.all %}
+            <div id="trekCarousel{{ trek.pk }}" class="carousel slide mb-4 shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
+
+                <!-- Indicators (Dots) -->
+                {% if trek.images.count > 1 %}
+                    <div class="carousel-indicators mb-2">
+                        {% for img in trek.images.all %}
+                            <button type="button" data-bs-target="#trekCarousel{{ trek.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}"></button>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Slides -->
+                <div class="carousel-inner">
+                    {% for img in trek.images.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ img.image.url }}" class="d-block w-100" style="height: 420px; object-fit: cover;" alt="{{ trek.title }}">
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Next/Prev Controls -->
+                {% if trek.images.count > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#trekCarousel{{ trek.pk }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-dark bg-opacity-50 rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#trekCarousel{{ trek.pk }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-dark bg-opacity-50 rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <h1 class="fw-bold mb-0">{{ trek.title }}</h1>
+            <span class="badge bg-info text-dark text-capitalize fs-6">{{ trek.get_difficulty_display }}</span>
+        </div>
+
+        <p class="text-secondary mb-4">
+            <i class="bi bi-geo-alt-fill me-1 text-danger"></i>{{ trek.destination }} |
+            <i class="bi bi-calendar-event me-1 text-primary"></i>{{ trek.date|date:"F j, Y" }}
+        </p>
+
+        <div class="card border-0 bg-body-tertiary rounded-4 p-4 mb-4">
+            <p class="mb-1"><strong>Organized by:</strong> {{ trek.created_by.username }}</p>
+            <p class="mb-0"><strong>Participants:</strong> {{ trek.participants.count }} / {{ trek.max_participants }}</p>
+        </div>
+
+        <!-- Join / Leave Action -->
+        {% if user.is_authenticated %}
+            {% if user_has_joined %}
+                <form action="{% url 'leave_trek' trek.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger rounded-pill px-4">Leave Trek</button>
+                </form>
+            {% elif trek.is_full %}
+                <button class="btn btn-secondary rounded-pill px-4" disabled>Trek Full</button>
+            {% else %}
+                <form action="{% url 'join_trek' trek.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Join Trek</button>
+                </form>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-primary rounded-pill px-4">Log in to Join</a>
+        {% endif %}
+
+        <a href="{% url 'trek_list' %}" class="btn btn-link rounded-pill px-0 mt-4 d-block">
+            <i class="bi bi-arrow-left me-1"></i>Back to all treks
+        </a>
+
+    </div>
+</div>
+{% endblock %}

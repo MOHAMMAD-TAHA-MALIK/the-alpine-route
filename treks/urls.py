@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.trek_list, name='trek_list'),
     path('upcoming/', views.upcoming_treks, name='upcoming_treks'),
     path('previous/', views.previous_treks, name='previous_treks'),
+    path('treks/<int:pk>/', views.trek_expedition_detail, name='trek_expedition_detail'),
 
     # Authentication & User Management
     path('register/', views.register, name='register'),

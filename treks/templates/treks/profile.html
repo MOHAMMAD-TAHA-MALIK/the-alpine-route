@@ -25,11 +25,20 @@
             <div class="row g-3 mb-5">
                 {% for trek in joined_treks %}
                     <div class="col-md-6">
-                        <div class="card h-100 border-0 shadow-sm rounded-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                            {% with trek.images.all|first as trek_image %}
+                                {% if trek_image %}
+                                    <a href="{% url 'trek_expedition_detail' trek.pk %}" class="d-block">
+                                        <img src="{{ trek_image.image.url }}" class="d-block w-100" style="height: 180px; object-fit: cover;" alt="{{ trek.title }}">
+                                    </a>
+                                {% endif %}
+                            {% endwith %}
                             <div class="card-body p-4 d-flex flex-column justify-content-between">
                                 <div>
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="fw-bold card-title mb-0">{{ trek.title }}</h5>
+                                        <h5 class="fw-bold card-title mb-0">
+                                            <a href="{% url 'trek_expedition_detail' trek.pk %}" class="text-decoration-none text-dark">{{ trek.title }}</a>
+                                        </h5>
                                         <span class="badge bg-info text-dark text-capitalize">{{ trek.get_difficulty_display }}</span>
                                     </div>
                                     <p class="text-secondary mb-2">
@@ -61,13 +70,20 @@
             <h3 class="fw-bold mb-3"><i class="bi bi-journal-plus me-2 text-warning"></i>Treks You Organized ({{ created_treks.count }})</h3>
             <div class="list-group shadow-sm rounded-4 mb-4">
                 {% for trek in created_treks %}
-                    <div class="list-group-item p-3 border-0 d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong class="fs-5">{{ trek.title }}</strong>
-                            <div class="text-secondary small">{{ trek.destination }} — {{ trek.date|date:"M j, Y" }}</div>
+                    <a href="{% url 'trek_expedition_detail' trek.pk %}" class="list-group-item list-group-item-action p-3 border-0 d-flex justify-content-between align-items-center text-decoration-none">
+                        <div class="d-flex align-items-center gap-3">
+                            {% with trek.images.all|first as trek_image %}
+                                {% if trek_image %}
+                                    <img src="{{ trek_image.image.url }}" class="rounded-3" style="width: 56px; height: 56px; object-fit: cover;" alt="{{ trek.title }}">
+                                {% endif %}
+                            {% endwith %}
+                            <div>
+                                <strong class="fs-5 text-dark">{{ trek.title }}</strong>
+                                <div class="text-secondary small">{{ trek.destination }} — {{ trek.date|date:"M j, Y" }}</div>
+                            </div>
                         </div>
                         <span class="badge bg-primary rounded-pill">{{ trek.participants.count }} / {{ trek.max_participants }} Participants</span>
-                    </div>
+                    </a>
                 {% endfor %}
             </div>
         {% endif %}
