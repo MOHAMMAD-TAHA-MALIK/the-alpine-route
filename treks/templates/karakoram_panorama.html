@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Karakoram Peakscapes | The Alpine Route{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/karakoram.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="kk-page panorama" aria-label="Interactive elevation panorama of the Karakoram range, Pakistan, viewed from the southwest">
+  <div class="panorama__frame">
+
+    <picture class="panorama__photo-wrap">
+      <source srcset="{% static 'images/karakoram-panorama.webp' %}" type="image/webp">
+      <img
+        class="panorama__photo"
+        src="{% static 'images/karakoram-panorama.jpg' %}"
+        alt="Panoramic dusk view of the Karakoram range in Pakistan: layered blue-grey ridgelines fading into a pale sky, with K2, the Broad Peak group and the Gasherbrums rising above the surrounding summits"
+        width="735" height="343"
+        loading="eager"
+        fetchpriority="high"
+      >
+    </picture>
+
+    <div class="panorama__wash" aria-hidden="true"></div>
+
+    <svg class="panorama__ridge" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path pathLength="100" d="M 0.00 83.56 C 1.00 83.06 4.50 80.14 6.00 80.56 C 7.50 80.98 7.75 85.65 9.00 86.11 C 10.25 86.57 11.92 85.18 13.50 83.33 C 15.08 81.48 16.42 78.24 18.50 75.00 C 20.58 71.76 23.58 63.66 26.00 63.89 C 28.42 64.12 30.92 76.16 33.00 76.39 C 35.08 76.62 36.67 65.51 38.50 65.28 C 40.33 65.05 42.08 72.45 44.00 75.00 C 45.92 77.55 48.00 81.02 50.00 80.56 C 52.00 80.10 54.17 74.07 56.00 72.22 C 57.83 70.37 59.25 71.06 61.00 69.44 C 62.75 67.82 64.67 61.34 66.50 62.50 C 68.33 63.66 70.17 73.61 72.00 76.39 C 73.83 79.17 75.50 81.25 77.50 79.17 C 79.50 77.09 81.83 64.82 84.00 63.89 C 86.17 62.96 87.83 71.49 90.50 73.61 C 93.17 75.73 98.42 76.11 100.00 76.61" />
+    </svg>
+
+    <ul class="panorama__peaks" role="list">
+      {% for peak in peaks %}
+      <li class="peak peak--{{ peak.tier }}{% if peak.lift > 1 %} peak--lift{{ peak.lift }}{% endif %}"
+          style="--x:{{ peak.x }}%; --y:{{ peak.y }}%;" role="listitem">
+        <button type="button" class="peak__btn" aria-describedby="tip-{{ peak.slug }}">
+          <span class="peak__dot" aria-hidden="true"></span>
+          <span class="peak__leader" aria-hidden="true"></span>
+          <span class="peak__name">{{ peak.name }}</span>
+          <span class="peak__tooltip" role="tooltip" id="tip-{{ peak.slug }}">
+            <span class="peak__tooltip-m">{{ peak.m_fmt }} m</span>
+            <span class="peak__tooltip-sep" aria-hidden="true">&middot;</span>
+            <span class="peak__tooltip-ft">{{ peak.ft_fmt }} ft</span>
+          </span>
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="panorama__titleband">
+    <p class="panorama__eyebrow">Baltoro Muztagh &middot; Karakoram</p>
+    <h1>Karakoram</h1>
+    <p class="panorama__country">Pakistan</p>
+    <div class="panorama__meta">
+      <span class="panorama__caption">Viewed from the southwest</span>
+      <span class="panorama__credit">Base artwork &copy; Raven Maps &amp; Images</span>
+    </div>
+  </div>
+
+  <p class="panorama__hint">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+      <circle cx="8" cy="8" r="6.5"/>
+      <path d="M8 5v3.5l2.2 2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Hover, tap, or tab through a peak to read its elevation
+  </p>
+</section>
+
+<section class="panorama-intro">
+  <p>
+    Sixteen summits of the Baltoro Muztagh, the subrange of the Karakoram that holds
+    four of the world's fourteen eight-thousanders within a single sightline: K2, Broad
+    Peak, and the twin giants Gasherbrum&nbsp;I and II, ringed by their lower satellite
+    peaks along the Baltoro Glacier.
+  </p>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/karakoram.js' %}" defer></script>
+{% endblock %}

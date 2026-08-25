@@ -1,6 +1,8 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from .karakoram_view import KarakoramPanoramaView
+ 
 
 urlpatterns = [
     # Navigation & List Views
@@ -50,4 +52,5 @@ urlpatterns = [
     path('trek/<int:pk>/', views.trek_detail, name='trek_detail'),
     path('trek/<int:pk>/like/', views.like_event, name='like_event'),
     path('trek/<int:pk>/comment/', views.add_comment, name='add_comment'),
+    path("karakoram/", KarakoramPanoramaView.as_view(), name="karakoram_panorama"),
 ]

@@ -1,0 +1,366 @@
+/* =========================================================================
+   Karakoram Peakscapes — page styles
+   Scoped under .kk-page so nothing here leaks onto the rest of the site.
+
+   Palette is sampled directly from the supplied panorama artwork (see
+   integration notes), not an invented default:
+     --kk-mist   pale dawn sky        (~#fafcf1 sampled from the photo)
+     --kk-slate  mid-ridge blue-grey  (~#41585e sampled from the photo)
+     --kk-ink    label/title teal     (~#2b4041 sampled from the photo)
+     --kk-abyss  foreground near-black(~#111419 sampled from the photo)
+     --kk-brass  single interactive accent — a surveyor's-instrument brass,
+                 not in the photo, used only for things you can act on
+   ========================================================================= */
+
+.kk-page {
+  --kk-mist: #F7F7EC;
+  --kk-haze: #93ACA9;
+  --kk-slate: #41585E;
+  --kk-ink: #22393A;
+  --kk-abyss: #0D1013;
+  --kk-brass: #C9A24B;
+  --kk-brass-bright: #E9C877;
+  --kk-seam: #2C3336; /* sampled from the photo's own bottom edge, post-crop */
+
+  --kk-font-display: 'Cormorant', Georgia, 'Times New Roman', serif;
+  --kk-font-body: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --kk-font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  color-scheme: dark;
+  color: var(--kk-mist);
+}
+
+/* ---------- full-bleed breakout from the Bootstrap .container ---------- */
+.kk-page.panorama {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: var(--kk-abyss);
+}
+
+/* ---------------------------- hero frame -------------------------------- */
+.panorama__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 735 / 343;
+  max-height: 78vh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.panorama__photo-wrap {
+  display: block;
+}
+
+.panorama__photo {
+  position: absolute;
+  inset: -4% 0 -4% 0; /* small vertical bleed so parallax never reveals an edge */
+  width: 100%;
+  height: 108%;
+  object-fit: cover;
+  object-position: center 40%;
+  transform: translateY(var(--kk-parallax, 0px));
+  will-change: transform;
+}
+
+.panorama__wash {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(13,16,19,.08) 0%, rgba(13,16,19,.02) 26%, rgba(13,16,19,.22) 62%, var(--kk-seam) 100%),
+    linear-gradient(0deg, rgba(13,16,19,.5) 0%, transparent 20%);
+  pointer-events: none;
+}
+
+/* ------------------------- SVG ridge contour ---------------------------- */
+.panorama__ridge {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.panorama__ridge path {
+  fill: none;
+  stroke: var(--kk-brass);
+  stroke-width: .16;
+  vector-effect: non-scaling-stroke;
+  opacity: .5;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .panorama__ridge path {
+    animation: kk-draw-in 2.4s ease-out .15s both;
+  }
+}
+@keyframes kk-draw-in {
+  from { stroke-dashoffset: 100; opacity: 0; }
+  to   { stroke-dashoffset: 0;   opacity: .5; }
+}
+
+/* ------------------------------ peak markers ----------------------------- */
+.panorama__peaks {
+  position: absolute;
+  inset: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.peak {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  --lift: 26px;
+}
+.peak--lift2 { --lift: 46px; }
+.peak--lift3 { --lift: 72px; }
+
+.peak__btn {
+  position: relative;
+  display: block;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--kk-mist);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* invisible ~28px touch target centered on the dot — the visible dot
+   alone (6-8px) is too small to meet touch-target guidance */
+.peak__btn::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  margin: -14px;
+}
+
+.peak__dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  margin: -3px;
+  border-radius: 50%;
+  background: var(--kk-mist);
+  opacity: .8;
+  transition: background-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.peak__leader {
+  position: absolute;
+  left: -0.5px;
+  top: 0;
+  width: 1px;
+  height: var(--lift);
+  transform: translateY(calc(-1 * var(--lift)));
+  background: linear-gradient(180deg, transparent, currentColor 85%);
+  color: var(--kk-mist);
+  opacity: .55;
+  transition: opacity .18s ease, background-color .18s ease;
+}
+
+.peak__name {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, calc(-1 * var(--lift) - 100%));
+  width: max-content;
+  max-width: 9ch;
+  text-align: center;
+  text-wrap: balance;
+  font-family: var(--kk-font-display);
+  letter-spacing: .04em;
+  line-height: 1.15;
+  text-shadow: 0 1px 6px rgba(0,0,0,.55);
+}
+
+.peak--major .peak__name { font-size: clamp(1rem, 2.4vw, 1.5rem); font-weight: 600; }
+.peak--mid   .peak__name { font-size: clamp(.68rem, 1.5vw, .95rem); font-weight: 500; color: var(--kk-mist); opacity: .92; }
+.peak--faint .peak__name { font-size: clamp(.6rem, 1.25vw, .82rem); font-weight: 500; color: var(--kk-haze); opacity: .78; font-style: italic; }
+
+.peak--major .peak__dot { width: 8px; height: 8px; margin: -4px; box-shadow: 0 0 0 3px rgba(247,247,236,.18); }
+
+/* --------------------------- tooltip (elevation) -------------------------- */
+.peak__tooltip {
+  position: absolute;
+  left: 0;
+  top: calc(-1 * var(--lift) + 14px);
+  transform: translate(-50%, -100%) translateY(-6px) scale(.94);
+  display: flex;
+  align-items: baseline;
+  gap: .35em;
+  white-space: nowrap;
+  padding: .3em .55em;
+  border-radius: 3px;
+  background: rgba(13, 16, 19, .92);
+  border: 1px solid rgba(201, 162, 75, .55);
+  font-family: var(--kk-font-mono);
+  font-size: .72rem;
+  color: var(--kk-brass-bright);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s ease, transform .16s ease;
+}
+.peak__tooltip::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 100%;
+  width: 6px; height: 6px;
+  margin-left: -3px; margin-top: -3px;
+  background: inherit;
+  border-right: 1px solid rgba(201, 162, 75, .55);
+  border-bottom: 1px solid rgba(201, 162, 75, .55);
+  transform: rotate(45deg);
+}
+.peak__tooltip-sep { opacity: .4; }
+
+/* reveal on hover, keyboard focus, or tap (.is-active set by karakoram.js) */
+.peak__btn:hover .peak__tooltip,
+.peak__btn:focus-visible .peak__tooltip,
+.peak__btn.is-active .peak__tooltip {
+  opacity: 1;
+  transform: translate(-50%, -100%) translateY(-10px) scale(1);
+}
+.peak__btn:hover .peak__dot,
+.peak__btn:focus-visible .peak__dot,
+.peak__btn.is-active .peak__dot {
+  background: var(--kk-brass-bright);
+  box-shadow: 0 0 0 4px rgba(233, 200, 119, .25);
+  transform: scale(1.15);
+}
+.peak__btn:hover .peak__leader,
+.peak__btn:focus-visible .peak__leader,
+.peak__btn.is-active .peak__leader {
+  opacity: 1;
+  color: var(--kk-brass-bright);
+}
+.peak__btn:hover .peak__name,
+.peak__btn:focus-visible .peak__name {
+  color: var(--kk-brass-bright);
+}
+
+.peak__btn:focus-visible {
+  outline: none;
+}
+.peak__btn:focus-visible .peak__dot {
+  outline: 2px solid var(--kk-brass-bright);
+  outline-offset: 3px;
+}
+
+/* -------------------------------- title band ---------------------------- */
+/* Sits directly below the (cropped) photo on the sampled seam color, so the
+   join reads as one continuous surface rather than two stacked boxes. */
+.panorama__titleband {
+  position: relative;
+  background: var(--kk-seam);
+  text-align: center;
+  padding: clamp(1.75rem, 6vw, 3.5rem) 3rem clamp(2.5rem, 7vw, 4rem);
+}
+.panorama__eyebrow {
+  margin: 0 0 .5em;
+  font-family: var(--kk-font-mono);
+  font-size: clamp(.55rem, 1.4vw, .72rem);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--kk-brass);
+  opacity: .9;
+}
+.panorama__titleband h1 {
+  margin: 0;
+  font-family: var(--kk-font-display);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6.5vw, 4rem);
+  letter-spacing: .18em;
+  color: var(--kk-mist);
+}
+.panorama__country {
+  margin: .5em 0 0;
+  font-family: var(--kk-font-body);
+  font-size: clamp(.75rem, 2vw, 1rem);
+  letter-spacing: .5em;
+  color: var(--kk-haze);
+}
+
+.panorama__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: clamp(1.75rem, 5vw, 3rem) auto 0;
+  max-width: 46rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(247, 247, 236, .12);
+  font-family: var(--kk-font-body);
+  font-size: .68rem;
+  letter-spacing: .03em;
+  color: var(--kk-haze);
+  opacity: .75;
+}
+@media (max-width: 640px) {
+  .panorama__meta { flex-direction: column; align-items: center; gap: .35rem; text-align: center; }
+}
+
+/* ------------------------------- hint line -------------------------------- */
+.panorama__hint {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  justify-content: center;
+  margin: 1rem 0 0;
+  padding: 0 1rem;
+  font-family: var(--kk-font-body);
+  font-size: .82rem;
+  color: var(--kk-slate);
+  text-align: center;
+}
+.panorama__hint svg { flex: none; opacity: .7; }
+
+/* ------------------------------- intro copy ------------------------------- */
+.panorama-intro {
+  max-width: 62ch;
+  margin: 1.75rem auto 0;
+  padding: 0 1rem;
+  font-family: var(--kk-font-body);
+  color: #3c4a4a;
+  line-height: 1.7;
+}
+
+/* ---------------------------------- motion --------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .panorama__photo { transform: none !important; }
+  .panorama__ridge path { animation: none; stroke-dashoffset: 0; opacity: .5; }
+  .peak__dot, .peak__leader, .peak__name, .peak__tooltip { transition: none; }
+}
+
+/* ---------------------------------- small screens --------------------------------- */
+@media (max-width: 640px) {
+  .peak--mid .peak__name,
+  .peak--faint .peak__name {
+    opacity: 0;
+    transform: translate(-50%, calc(-1 * var(--lift) - 100%)) translateY(4px);
+    transition: opacity .16s ease, transform .16s ease;
+  }
+  .peak--mid .peak__btn:hover .peak__name,
+  .peak--mid .peak__btn:focus-visible .peak__name,
+  .peak--mid .peak__btn.is-active .peak__name,
+  .peak--faint .peak__btn:hover .peak__name,
+  .peak--faint .peak__btn:focus-visible .peak__name,
+  .peak--faint .peak__btn.is-active .peak__name {
+    opacity: 1;
+    transform: translate(-50%, calc(-1 * var(--lift) - 100%)) translateY(0);
+  }
+  .panorama__country { letter-spacing: .35em; }
+}
+
+@media (max-width: 420px) {
+  .panorama__hint { font-size: .74rem; }
+}

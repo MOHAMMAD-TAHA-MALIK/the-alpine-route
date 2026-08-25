@@ -6,6 +6,7 @@
     <title>{% block title %}The Alpine Route{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-light">
 
@@ -89,6 +90,88 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Site footer (was a separate footer.html include; inlined here so this
+         file has no dependency on a second template being discoverable by
+         Django's template loader — drop this file in and it just works). -->
+    <footer class="site-footer bg-dark text-light-emphasis mt-5">
+        <div class="container py-4">
+            <div class="row gy-3 align-items-center">
+
+                <div class="col-12 col-md-4">
+                    <a class="d-inline-flex align-items-center fw-bold text-light text-decoration-none" href="{% url 'trek_list' %}">
+                        <i class="bi bi-mountains me-2 text-primary"></i>The Alpine Route
+                    </a>
+                    <p class="small text-secondary mb-0 mt-1">Trek together. Remember longer.</p>
+                </div>
+
+                <nav class="col-12 col-md-4" aria-label="Footer">
+                    <ul class="list-unstyled d-flex flex-wrap gap-3 justify-content-md-center mb-0 footer-links">
+                        <li><a href="{% url 'trek_list' %}">All Treks</a></li>
+                        <li><a href="{% url 'upcoming_treks' %}">Upcoming</a></li>
+                        <li><a href="{% url 'previous_treks' %}">Past Events</a></li>
+                    </ul>
+                </nav>
+
+                <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end gap-3">
+                    <a href="https://github.com/" aria-label="The Alpine Route on GitHub" class="footer-icon-link" target="_blank" rel="noopener noreferrer">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                                     0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
+                                     1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
+                                     0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68
+                                     0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82
+                                     2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0
+                                     .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.linkedin.com/" aria-label="The Alpine Route on LinkedIn" class="footer-icon-link" target="_blank" rel="noopener noreferrer">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+                            <path d="M0 1.15C0 .52.53 0 1.19 0h13.62C15.47 0 16 .52 16 1.15v13.7c0 .63-.53 1.15-1.19
+                                     1.15H1.19C.53 16 0 15.48 0 14.85V1.15Zm4.94 12.3V6.17H2.4v7.28h2.54ZM3.67
+                                     5.13c.89 0 1.44-.58 1.44-1.32-.02-.75-.55-1.32-1.42-1.32-.87 0-1.44.57-1.44
+                                     1.32 0 .74.55 1.32 1.4 1.32h.02Zm4.59 8.32v-4.07c0-.22.02-.43.08-.59.18-.43.58-.88
+                                     1.25-.88.89 0 1.24.68 1.24 1.67v3.87h2.54V9.2c0-2.35-1.25-3.44-2.92-3.44-1.36
+                                     0-1.96.75-2.3 1.27v.03h-.02l.02-.03V6.17H5.6c.03.72 0 7.28 0 7.28h2.54Z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <hr class="border-secondary my-3">
+
+            <p class="small text-secondary text-center mb-0">&copy; {% now "Y" %} The Alpine Route. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <style>
+        .site-footer .footer-links a {
+            color: var(--bs-secondary-color, #adb5bd);
+            text-decoration: none;
+            font-size: .9rem;
+        }
+        .site-footer .footer-links a:hover,
+        .site-footer .footer-links a:focus-visible {
+            color: #fff;
+            text-decoration: underline;
+        }
+        .site-footer .footer-icon-link {
+            color: var(--bs-secondary-color, #adb5bd);
+            display: inline-flex;
+            transition: color .15s ease, transform .15s ease;
+        }
+        .site-footer .footer-icon-link:hover,
+        .site-footer .footer-icon-link:focus-visible {
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .site-footer .footer-icon-link:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 3px;
+            border-radius: 2px;
+        }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

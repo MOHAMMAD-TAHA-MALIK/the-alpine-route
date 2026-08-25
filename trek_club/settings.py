@@ -78,6 +78,16 @@ LOGIN_URL = 'login'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# -------------------------------------------------------
+# ADDED: without this, Django's static file finder only looks
+# inside each installed app's own <app>/static/ folder (i.e.
+# treks/static/). A project-level /static/ folder next to
+# manage.py -- where shared css/js/image assets live -- is
+# invisible to `collectstatic` (and therefore to WhiteNoise on
+# Render) until it's listed here.
+# -------------------------------------------------------
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
