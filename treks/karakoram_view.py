@@ -1,11 +1,16 @@
 """
-Karakoram panorama page — view + data.
+Karakoram panorama — peak dataset.
 
-Drop this into your app (e.g. append to views.py, or keep as
-treks/karakoram.py and import the view into urls.py). The 16 peaks below
-are read from the supplied "Karakoram Peakscapes" artwork; elevations
-are given in both metres (as printed on the artwork) and feet
-(computed, 1 m = 3.280839895 ft) so the template does no math.
+Imported by views.py (`from .karakoram_view import PEAKS as KARAKORAM_PEAKS`)
+and passed into trek_list()'s context, which trek_list.html loops over to
+render the hero on the homepage. There's no standalone view here anymore --
+the panorama used to live on its own page at /karakoram/, but that page and
+its route were removed once the hero got embedded directly into
+trek_list.html; this file kept only the data both versions shared.
+
+The 16 peaks below are read from the supplied "Karakoram Peakscapes"
+artwork; elevations are given in both metres (as printed on the artwork)
+and feet (computed, 1 m = 3.280839895 ft) so the template does no math.
 
 A couple of the smaller, greyed-out summits on the source artwork
 (Marble Peak, Durbin Kangri I) print elevation figures too small to
@@ -14,8 +19,6 @@ best-available estimates and are worth checking against the original
 artwork file if exact precision matters to you. Every other figure
 was cross-checked against its real-world elevation.
 """
-
-from django.views.generic import TemplateView
 
 PEAKS = [
     {"name": "Angel", "slug": "angel", "m": 6858, "m_fmt": "6,858", "ft": 22500, "ft_fmt": "22,500", "tier": "mid", "x": 6, "y": 80.56, "lift": 1},
@@ -35,19 +38,3 @@ PEAKS = [
     {"name": "Gasherbrum I", "slug": "gasherbrum-i", "m": 8080, "m_fmt": "8,080", "ft": 26509, "ft_fmt": "26,509", "tier": "major", "x": 84, "y": 63.89, "lift": 3},
     {"name": "Gasherbrum I South", "slug": "gasherbrum-i-south", "m": 6404, "m_fmt": "6,404", "ft": 21010, "ft_fmt": "21,010", "tier": "mid", "x": 90.5, "y": 73.61, "lift": 1},
 ]
-
-
-class KarakoramPanoramaView(TemplateView):
-    template_name = "karakoram_panorama.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["peaks"] = PEAKS
-        return context
-
-
-# urls.py
-#   from .karakoram_view import KarakoramPanoramaView
-#   urlpatterns += [
-#       path("karakoram/", KarakoramPanoramaView.as_view(), name="karakoram_panorama"),
-#   ]

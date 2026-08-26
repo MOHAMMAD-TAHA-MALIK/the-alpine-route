@@ -78,15 +78,16 @@ LOGIN_URL = 'login'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# -------------------------------------------------------
-# ADDED: without this, Django's static file finder only looks
-# inside each installed app's own <app>/static/ folder (i.e.
-# treks/static/). A project-level /static/ folder next to
-# manage.py -- where shared css/js/image assets live -- is
-# invisible to `collectstatic` (and therefore to WhiteNoise on
-# Render) until it's listed here.
-# -------------------------------------------------------
-STATICFILES_DIRS = [BASE_DIR / 'static']
+# NOTE: no STATICFILES_DIRS needed. Your css/js/image assets live in
+# treks/static/, and Django's AppDirectoriesFinder auto-discovers
+# <app>/static/ for every app in INSTALLED_APPS -- 'treks' already
+# qualifies. (An earlier version of this file pointed
+# STATICFILES_DIRS at BASE_DIR / 'static', a folder that doesn't
+# exist in your project -- that raises ImproperlyConfigured the
+# moment anything touches the staticfiles finders, which is why
+# css/karakoram.css and the panorama image were both failing to
+# load. Removed rather than pointed at a real folder, since it
+# was never needed in the first place.)
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
