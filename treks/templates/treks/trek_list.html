@@ -1,283 +1,1535 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ title|default:"All Treks" }} - The Alpine Route{% endblock %}
+{% block title %}{{ title|default:"The Alpine Route" }}{% endblock %}
 
 {% block extra_css %}
-{% if title == 'All Treks' or not title %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/karakoram.css' %}">
-{% endif %}
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+<style>
+    /* =========================================================
+       ALPINE ROUTE — HOMEPAGE
+       ========================================================= */
+
+    :root {
+        --alpine-ink: #10263d;
+        --alpine-navy: #173b5c;
+        --alpine-blue: #2e5f8d;
+        --alpine-steel: #6f879c;
+        --alpine-mist: #e9f0f5;
+        --alpine-snow: #f8fafb;
+        --alpine-border: #d9e2e9;
+        --alpine-muted: #718294;
+        --alpine-white: #ffffff;
+    }
+
+    body {
+        background: var(--alpine-snow) !important;
+        color: var(--alpine-ink);
+        font-family: "DM Sans", sans-serif;
+    }
+
+    /* Remove Bootstrap's normal main spacing on this page.
+       The hero needs to touch the viewport edges. */
+    main.container {
+        max-width: none !important;
+        width: 100%;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .alpine-hero {
+        position: relative;
+        min-height: 560px;
+        overflow: visible;
+        isolation: isolate;
+
+        background:
+            linear-gradient(
+                180deg,
+                #f8fafb 0%,
+                #f3f7fa 25%,
+                #dce8f0 57%,
+                #9fb6c8 100%
+            );
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 8;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 75px 24px 155px;
+        text-align: center;
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--alpine-blue);
+        font-size: .78rem;
+        font-weight: 700;
+        letter-spacing: .25em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+    }
+
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+        content: "";
+        width: 36px;
+        height: 1px;
+        background: #7892a8;
+        opacity: .7;
+    }
+
+    .hero-title {
+        margin: 0;
+        color: #112940;
+        font-family: "DM Serif Display", Georgia, serif;
+        font-size: clamp(3.4rem, 7vw, 6.8rem);
+        line-height: .91;
+        letter-spacing: -.045em;
+        font-weight: 400;
+    }
+
+    .hero-title span {
+        display: block;
+        color: #2d608e;
+    }
+
+    .hero-description {
+        max-width: 590px;
+        margin: 25px auto 30px;
+        color: #344c62;
+        font-size: 1.05rem;
+        line-height: 1.75;
+    }
+
+    .hero-description strong {
+        font-weight: 700;
+        color: var(--alpine-ink);
+    }
+
+    .hero-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 52px;
+        padding: 0 26px;
+        border-radius: 12px;
+        background: #12314d;
+        color: white !important;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 12px 30px rgba(16, 38, 61, .18);
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .hero-cta:hover {
+        background: #204f77;
+        transform: translateY(-2px);
+        box-shadow: 0 16px 34px rgba(16, 38, 61, .24);
+    }
+
+    .hero-cta i {
+        font-size: 1.05rem;
+    }
+
+    /* =========================================================
+       MOUNTAIN SVG
+       ========================================================= */
+
+    .mountain-art {
+        position: absolute;
+        inset: auto 0 0;
+        width: 100%;
+        height: 355px;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .mountain-art svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    .mountain-back {
+        fill: #dce7ee;
+    }
+
+    .mountain-mid {
+        fill: #b7cbd9;
+    }
+
+    .mountain-front {
+        fill: #718da3;
+    }
+
+    .mountain-dark {
+        fill: #17344d;
+    }
+
+    .mountain-line {
+        fill: none;
+        stroke: #6c879d;
+        stroke-width: 1.2;
+        opacity: .46;
+    }
+
+    .mountain-line-light {
+        fill: none;
+        stroke: #edf4f8;
+        stroke-width: 1.15;
+        opacity: .8;
+    }
+
+    .pine {
+        fill: #123149;
+    }
+
+    /* =========================================================
+       SEARCH BAR
+       ========================================================= */
+
+    .hero-search-wrap {
+        position: absolute;
+        z-index: 20;
+        left: 50%;
+        bottom: 0;
+        width: min(1060px, calc(100% - 32px));
+        transform: translate(-50%, 50%);
+    }
+
+    .hero-search {
+        display: grid;
+        grid-template-columns: 1.45fr 1fr 1fr auto;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid rgba(255,255,255,.9);
+        border-radius: 18px;
+        background: rgba(255,255,255,.94);
+        backdrop-filter: blur(18px);
+        box-shadow:
+            0 22px 55px rgba(23, 59, 92, .16),
+            0 3px 12px rgba(23, 59, 92, .06);
+    }
+
+    .search-field {
+        position: relative;
+    }
+
+    .search-field i {
+        position: absolute;
+        left: 17px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #55718a;
+        z-index: 2;
+    }
+
+    .search-field input,
+    .search-field select {
+        width: 100%;
+        height: 48px;
+        padding: 0 16px 0 46px;
+        border: 1px solid #dce4ea;
+        border-radius: 11px;
+        background: #fff;
+        color: #183149;
+        font-family: inherit;
+        font-size: .92rem;
+        outline: none;
+        appearance: auto;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .search-field select {
+        padding-left: 44px;
+        cursor: pointer;
+    }
+
+    .search-field input:focus,
+    .search-field select:focus {
+        border-color: #6c8ca8;
+        box-shadow: 0 0 0 4px rgba(62, 103, 139, .1);
+    }
+
+    .search-button {
+        min-width: 155px;
+        border: 0;
+        border-radius: 11px;
+        background: #153650;
+        color: #fff;
+        font-family: inherit;
+        font-weight: 700;
+        padding: 0 22px;
+        cursor: pointer;
+        transition: background .2s ease, transform .2s ease;
+    }
+
+    .search-button:hover {
+        background: #234f75;
+        transform: translateY(-1px);
+    }
+
+    .search-button i {
+        margin-left: 8px;
+    }
+
+    /* =========================================================
+       CONTENT SECTION
+       ========================================================= */
+
+    .adventure-section {
+        position: relative;
+        padding: 112px 24px 65px;
+        background:
+            radial-gradient(
+                circle at 20% 0%,
+                rgba(205, 220, 230, .25),
+                transparent 30%
+            ),
+            #f8fafb;
+    }
+
+    .section-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    .section-heading-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+
+    .section-eyebrow {
+        margin: 0 0 7px;
+        color: #3e6688;
+        font-size: .74rem;
+        font-weight: 700;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+    }
+
+    .section-title {
+        margin: 0;
+        font-family: "DM Serif Display", Georgia, serif;
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 400;
+        letter-spacing: -.025em;
+        color: #10263d;
+    }
+
+    .view-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: #173f62;
+        text-decoration: none;
+        font-size: .9rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .view-all i {
+        transition: transform .2s ease;
+    }
+
+    .view-all:hover i {
+        transform: translateX(4px);
+    }
+
+    /* =========================================================
+       CARDS
+       ========================================================= */
+
+    .adventure-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 22px;
+    }
+
+    .adventure-card {
+        position: relative;
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid #dce4ea;
+        border-radius: 17px;
+        background: white;
+        box-shadow: 0 8px 24px rgba(26, 51, 73, .08);
+        transition:
+            transform .25s ease,
+            box-shadow .25s ease,
+            border-color .25s ease;
+    }
+
+    .adventure-card:hover {
+        transform: translateY(-6px);
+        border-color: #b9cbd8;
+        box-shadow: 0 18px 38px rgba(26, 51, 73, .14);
+    }
+
+    .card-image-wrap {
+        position: relative;
+        height: 225px;
+        overflow: hidden;
+        background:
+            linear-gradient(145deg, #dce8ef, #7995aa);
+    }
+
+    .card-image-wrap img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        transition: transform .55s ease;
+    }
+
+    .adventure-card:hover .card-image-wrap img {
+        transform: scale(1.045);
+    }
+
+    .image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            180deg,
+            rgba(9, 29, 46, .04) 35%,
+            rgba(9, 29, 46, .48) 100%
+        );
+        pointer-events: none;
+    }
+
+    .date-badge {
+        position: absolute;
+        left: 14px;
+        top: 14px;
+        width: 52px;
+        height: 58px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+        background: rgba(17, 45, 69, .92);
+        color: white;
+        line-height: 1;
+        box-shadow: 0 8px 18px rgba(5, 24, 39, .18);
+        backdrop-filter: blur(8px);
+    }
+
+    .date-badge strong {
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .date-badge span {
+        margin-top: 5px;
+        font-size: .64rem;
+        letter-spacing: .12em;
+        font-weight: 700;
+        opacity: .86;
+    }
+
+    .type-badge {
+        position: absolute;
+        right: 14px;
+        top: 14px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.92);
+        color: #173b5c;
+        font-size: .65rem;
+        font-weight: 800;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        box-shadow: 0 5px 14px rgba(7, 27, 44, .12);
+    }
+
+    .card-body-custom {
+        padding: 18px 17px 16px;
+    }
+
+    .card-title-custom {
+        margin: 0 0 10px;
+        color: #152b40;
+        font-size: 1rem;
+        line-height: 1.35;
+        font-weight: 700;
+    }
+
+    .card-title-custom a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .card-title-custom a:hover {
+        color: #2e628f;
+    }
+
+    .card-meta {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        min-height: 40px;
+        color: #718294;
+        font-size: .78rem;
+        line-height: 1.45;
+    }
+
+    .card-meta i {
+        flex: 0 0 auto;
+        margin-top: 2px;
+        color: #4d708d;
+    }
+
+    .card-divider {
+        height: 1px;
+        margin: 14px 0 12px;
+        background: #e6ebef;
+    }
+
+    .card-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .difficulty {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: .7rem;
+        font-weight: 800;
+    }
+
+    .difficulty.easy {
+        color: #27654a;
+        background: #e0f3e8;
+    }
+
+    .difficulty.moderate {
+        color: #27628c;
+        background: #dcecf8;
+    }
+
+    .difficulty.hard {
+        color: #934646;
+        background: #f8dfdf;
+    }
+
+    .participants {
+        color: #66798b;
+        font-size: .74rem;
+        white-space: nowrap;
+    }
+
+    .participants i {
+        margin-right: 4px;
+    }
+
+    .card-arrow {
+        width: 35px;
+        height: 35px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        border: 1px solid #9ab0c2;
+        border-radius: 50%;
+        color: #183b5a;
+        text-decoration: none;
+        transition: all .2s ease;
+    }
+
+    .card-arrow:hover {
+        color: #fff;
+        background: #173b5c;
+        border-color: #173b5c;
+    }
+
+    .event-description {
+        margin-top: 8px;
+        color: #7a8996;
+        font-size: .77rem;
+        line-height: 1.5;
+    }
+
+    .event-likes {
+        color: #718294;
+        font-size: .73rem;
+    }
+
+    .event-likes i {
+        color: #718ca2;
+        margin-right: 4px;
+    }
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
+
+    .empty-state {
+        grid-column: 1 / -1;
+        padding: 55px 20px;
+        border: 1px dashed #bdcbd5;
+        border-radius: 18px;
+        text-align: center;
+        background: rgba(255,255,255,.7);
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        color: #7c96aa;
+    }
+
+    .empty-state h3 {
+        margin-top: 14px;
+        font-family: "DM Serif Display", Georgia, serif;
+        font-weight: 400;
+        color: #18344e;
+    }
+
+    .empty-state p {
+        color: #718294;
+    }
+
+    /* =========================================================
+       VALUE STRIP
+       ========================================================= */
+
+    .values-strip {
+        max-width: 1180px;
+        margin: 20px auto 75px;
+        padding: 26px 0 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid #dce5eb;
+    }
+
+    .value-item {
+        text-align: center;
+        padding: 0 20px;
+        border-right: 1px solid #dce5eb;
+    }
+
+    .value-item:last-child {
+        border-right: 0;
+    }
+
+    .value-icon {
+        color: #3f6889;
+        font-size: 1.25rem;
+        margin-bottom: 7px;
+    }
+
+    .value-title {
+        color: #173b5c;
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .value-text {
+        margin: 5px 0 0;
+        color: #7a8996;
+        font-size: .76rem;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1100px) {
+        .adventure-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .hero-search {
+            grid-template-columns: 1.3fr 1fr 1fr;
+        }
+
+        .search-button {
+            grid-column: 1 / -1;
+            height: 48px;
+        }
+    }
+
+    @media (max-width: 800px) {
+        .alpine-hero {
+            min-height: 650px;
+        }
+
+        .hero-content {
+            padding-top: 60px;
+            padding-bottom: 210px;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 13vw, 5rem);
+        }
+
+        .mountain-art {
+            height: 340px;
+        }
+
+        .hero-search {
+            grid-template-columns: 1fr;
+        }
+
+        .search-button {
+            grid-column: auto;
+        }
+
+        .adventure-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .values-strip {
+            grid-template-columns: repeat(2, 1fr);
+            row-gap: 24px;
+        }
+
+        .value-item:nth-child(2) {
+            border-right: 0;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .alpine-hero {
+            min-height: 690px;
+        }
+
+        .hero-content {
+            padding: 48px 18px 225px;
+        }
+
+        .hero-title {
+            font-size: 3.15rem;
+        }
+
+        .hero-description {
+            font-size: .93rem;
+        }
+
+        .hero-search-wrap {
+            width: calc(100% - 22px);
+        }
+
+        .hero-search {
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .adventure-section {
+            padding: 105px 15px 45px;
+        }
+
+        .section-heading-row {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .adventure-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-image-wrap {
+            height: 245px;
+        }
+
+        .values-strip {
+            margin-left: 15px;
+            margin-right: 15px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .value-item {
+            padding: 0 8px;
+        }
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        .adventure-card,
+        .card-image-wrap img,
+        .hero-cta,
+        .search-button {
+            transition: none;
+        }
+    }
+</style>
 {% endblock %}
+
 
 {% block content %}
 
-{% if title == 'All Treks' or not title %}
-<section class="kk-page panorama" aria-label="Interactive elevation panorama of the Karakoram range, Pakistan, viewed from the southwest">
-  <div class="panorama__frame">
+<!-- =========================================================
+     HERO
+     ========================================================= -->
 
-    <picture class="panorama__photo-wrap">
-      <source srcset="{% static 'images/karakoram-panorama.webp' %}" type="image/webp">
-      <img
-        class="panorama__photo"
-        src="{% static 'images/karakoram-panorama.jpg' %}"
-        alt="Panoramic dusk view of the Karakoram range in Pakistan: layered blue-grey ridgelines fading into a pale sky, with K2, the Broad Peak group and the Gasherbrums rising above the surrounding summits"
-        width="735" height="343"
-        loading="eager"
-        fetchpriority="high"
-      >
-    </picture>
+<section class="alpine-hero">
 
-    <div class="panorama__wash" aria-hidden="true"></div>
+    <div class="hero-content">
 
-    <svg class="panorama__ridge" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <path pathLength="100" d="M 0.00 83.56 C 1.00 83.06 4.50 80.14 6.00 80.56 C 7.50 80.98 7.75 85.65 9.00 86.11 C 10.25 86.57 11.92 85.18 13.50 83.33 C 15.08 81.48 16.42 78.24 18.50 75.00 C 20.58 71.76 23.58 63.66 26.00 63.89 C 28.42 64.12 30.92 76.16 33.00 76.39 C 35.08 76.62 36.67 65.51 38.50 65.28 C 40.33 65.05 42.08 72.45 44.00 75.00 C 45.92 77.55 48.00 81.02 50.00 80.56 C 52.00 80.10 54.17 74.07 56.00 72.22 C 57.83 70.37 59.25 71.06 61.00 69.44 C 62.75 67.82 64.67 61.34 66.50 62.50 C 68.33 63.66 70.17 73.61 72.00 76.39 C 73.83 79.17 75.50 81.25 77.50 79.17 C 79.50 77.09 81.83 64.82 84.00 63.89 C 86.17 62.96 87.83 71.49 90.50 73.61 C 93.17 75.73 98.42 76.11 100.00 76.61" />
-    </svg>
+        <div class="hero-eyebrow">
+            Adventure is calling
+        </div>
 
-    <ul class="panorama__peaks" role="list">
-      {% for peak in peaks %}
-      <li class="peak peak--{{ peak.tier }}{% if peak.lift > 1 %} peak--lift{{ peak.lift }}{% endif %}"
-          style="--x:{{ peak.x }}%; --y:{{ peak.y }}%;" role="listitem">
-        <button type="button" class="peak__btn" aria-describedby="tip-{{ peak.slug }}">
-          <span class="peak__dot" aria-hidden="true"></span>
-          <span class="peak__leader" aria-hidden="true"></span>
-          <span class="peak__name">{{ peak.name }}</span>
-          <span class="peak__tooltip" role="tooltip" id="tip-{{ peak.slug }}">
-            <span class="peak__tooltip-m">{{ peak.m_fmt }} m</span>
-            <span class="peak__tooltip-sep" aria-hidden="true">&middot;</span>
-            <span class="peak__tooltip-ft">{{ peak.ft_fmt }} ft</span>
-          </span>
-        </button>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
+        <h1 class="hero-title">
+            Explore More.
+            <span>Live Fully.</span>
+        </h1>
 
-  <div class="panorama__titleband">
-    <p class="panorama__eyebrow">Baltoro Muztagh &middot; Karakoram</p>
-    <h1>Karakoram</h1>
-    <p class="panorama__country">Pakistan</p>
-    <div class="panorama__meta">
-      <span class="panorama__caption">Viewed from the southwest</span>
-      <span class="panorama__credit">Base artwork &copy; Raven Maps &amp; Images</span>
+        <p class="hero-description">
+            Find breathtaking treks and inspiring events.
+            <br>
+            <strong>Connect with explorers and create memories that last a lifetime.</strong>
+        </p>
+
+        <a href="#adventures" class="hero-cta">
+            <i class="bi bi-triangle"></i>
+            Explore Now
+        </a>
+
     </div>
-  </div>
 
-  <p class="panorama__hint">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
-      <circle cx="8" cy="8" r="6.5"/>
-      <path d="M8 5v3.5l2.2 2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Hover, tap, or tab through a peak to read its elevation
-  </p>
+
+    <!-- Mountain illustration -->
+    <div class="mountain-art" aria-hidden="true">
+
+        <svg viewBox="0 0 1440 420" preserveAspectRatio="none">
+
+            <!-- Distant ridge -->
+            <path
+                class="mountain-back"
+                d="M0 330
+                   L80 265 L135 295 L205 205
+                   L260 270 L325 175 L390 260
+                   L455 220 L520 275
+                   L585 170 L650 245
+                   L715 210 L785 285
+                   L850 190 L915 260
+                   L985 160 L1050 250
+                   L1120 195 L1185 265
+                   L1260 175 L1325 250
+                   L1385 205 L1440 245
+                   L1440 420 L0 420 Z" />
+
+            <!-- Mid ridge -->
+            <path
+                class="mountain-mid"
+                d="M0 345
+                   L75 290 L135 325
+                   L215 245 L275 300
+                   L355 210 L420 295
+                   L485 250 L555 320
+                   L625 215 L690 300
+                   L755 250 L825 325
+                   L905 225 L975 305
+                   L1040 240 L1115 315
+                   L1195 230 L1260 310
+                   L1335 250 L1400 315
+                   L1440 285
+                   L1440 420 L0 420 Z" />
+
+            <!-- Front ridge -->
+            <path
+                class="mountain-front"
+                d="M0 355
+                   L95 315 L155 340
+                   L245 280 L320 345
+                   L400 270 L475 340
+                   L555 300 L635 355
+                   L720 275 L800 345
+                   L890 285 L965 355
+                   L1040 290 L1120 350
+                   L1200 275 L1280 340
+                   L1360 285 L1440 335
+                   L1440 420 L0 420 Z" />
+
+            <!-- Dark foreground -->
+            <path
+                class="mountain-dark"
+                d="M0 375
+                   L70 345 L120 375
+                   L175 330 L230 385
+                   L300 340 L365 390
+                   L430 350 L495 395
+                   L570 345 L635 390
+                   L710 335 L775 390
+                   L850 350 L925 395
+                   L1000 340 L1070 390
+                   L1145 345 L1210 395
+                   L1290 335 L1360 380
+                   L1410 350 L1440 365
+                   L1440 420 L0 420 Z" />
+
+            <!-- contour lines -->
+            <path
+                class="mountain-line-light"
+                d="M25 324 C130 285 170 345 250 295 S390 300 465 270 S600 300 680 260 S820 295 900 250 S1030 300 1110 255 S1280 295 1410 250" />
+
+            <path
+                class="mountain-line"
+                d="M0 350 C110 305 180 365 270 315 S410 325 500 295 S640 330 730 285 S860 330 950 290 S1100 325 1200 285 S1340 325 1440 280" />
+
+            <path
+                class="mountain-line"
+                d="M0 370 C120 330 190 380 285 340 S425 355 515 320 S655 360 750 315 S890 355 980 320 S1130 355 1225 315 S1360 355 1440 320" />
+
+            <path
+                class="mountain-line-light"
+                d="M75 300 L135 260 L165 315
+                   M300 265 L355 220 L390 290
+                   M575 225 L625 180 L660 255
+                   M850 240 L900 200 L935 275
+                   M1040 230 L1090 195 L1120 265
+                   M1210 235 L1260 195 L1295 270" />
+
+            <!-- Pine silhouettes -->
+            <g class="pine">
+                <path d="M25 420 L25 340 L5 370 L18 370 L0 395 L18 392 L2 420 Z"/>
+                <path d="M55 420 L55 315 L28 355 L45 355 L22 385 L45 382 L25 420 Z"/>
+                <path d="M92 420 L92 335 L72 365 L84 365 L65 392 L84 389 L68 420 Z"/>
+
+                <path d="M1340 420 L1340 315 L1317 350 L1333 350 L1308 383 L1333 379 L1313 420 Z"/>
+                <path d="M1380 420 L1380 290 L1353 330 L1370 330 L1345 365 L1370 362 L1348 420 Z"/>
+                <path d="M1420 420 L1420 330 L1402 360 L1413 360 L1398 388 L1413 385 L1403 420 Z"/>
+            </g>
+
+        </svg>
+
+    </div>
+
+
+    <!-- =====================================================
+         SEARCH
+         ===================================================== -->
+
+    <div class="hero-search-wrap">
+
+        <form
+            class="hero-search"
+            id="adventureSearch"
+            method="get"
+            action="{% url 'trek_list' %}"
+        >
+
+            <div class="search-field">
+                <i class="bi bi-search"></i>
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ query|default:'' }}"
+                    placeholder="Search by destination..."
+                    aria-label="Search by destination"
+                >
+            </div>
+
+            <div class="search-field">
+                <i class="bi bi-compass"></i>
+                <select
+                    name="difficulty"
+                    aria-label="Difficulty"
+                >
+                    <option value="">All Difficulties</option>
+                    <option value="easy" {% if difficulty == "easy" %}selected{% endif %}>
+                        Easy
+                    </option>
+                    <option value="moderate" {% if difficulty == "moderate" %}selected{% endif %}>
+                        Moderate
+                    </option>
+                    <option value="hard" {% if difficulty == "hard" %}selected{% endif %}>
+                        Hard
+                    </option>
+                </select>
+            </div>
+
+            <div class="search-field">
+                <i class="bi bi-calendar3"></i>
+                <select id="dateFilter" aria-label="Date">
+                    <option value="any">Any Date</option>
+                    <option value="month">This Month</option>
+                    <option value="next3">Next 3 Months</option>
+                </select>
+            </div>
+
+            <button class="search-button" type="submit">
+                Search
+                <i class="bi bi-arrow-right"></i>
+            </button>
+
+        </form>
+
+    </div>
+
 </section>
-{% endif %}
 
-<!-- BUG 2 FIX: dynamic title instead of hardcoded "Upcoming Expeditions" -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0">
-        <i class="bi bi-calendar-event text-primary me-2"></i>{{ title|default:"All Treks" }}
-    </h2>
-</div>
 
-<!-- BUG 12 FIX: search and filter form (view already supports ?q= and ?difficulty=) -->
-<form method="get" class="row g-2 mb-4">
-    <div class="col-md-6">
-        <input type="text"
-               name="q"
-               value="{{ query }}"
-               class="form-control rounded-pill"
-               placeholder="Search by destination...">
-    </div>
-    <div class="col-md-4">
-        <select name="difficulty" class="form-select rounded-pill">
-            <option value="">All Difficulties</option>
-            <option value="easy"     {% if difficulty == 'easy'     %}selected{% endif %}>Easy</option>
-            <option value="moderate" {% if difficulty == 'moderate' %}selected{% endif %}>Moderate</option>
-            <option value="hard"     {% if difficulty == 'hard'     %}selected{% endif %}>Hard</option>
-        </select>
-    </div>
-    <div class="col-md-2">
-        <button type="submit" class="btn btn-primary rounded-pill w-100">
-            <i class="bi bi-search me-1"></i>Filter
-        </button>
-    </div>
-</form>
+<!-- =========================================================
+     TREKS + EVENTS
+     ========================================================= -->
 
-<!-- TREKS SECTION -->
-{% if treks %}
-    <div class="row g-4">
-        {% for trek in treks %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                    {% with trek.images.all as trek_images %}
-                        {% if trek_images %}
-                            <div id="trek-carousel-{{ trek.pk }}" class="carousel slide">
-                                <div class="carousel-inner">
-                                    {% for image in trek_images %}
-                                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                            <a href="{% url 'trek_expedition_detail' trek.pk %}" class="d-block">
-                                                <img src="{{ image.image.url }}" class="d-block w-100" style="height: 180px; object-fit: cover;" alt="{{ trek.title }} - photo {{ forloop.counter }}">
-                                            </a>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                {% if trek_images|length > 1 %}
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#trek-carousel-{{ trek.pk }}" data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Previous photo</span>
-                                    </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#trek-carousel-{{ trek.pk }}" data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Next photo</span>
-                                    </button>
-                                    <div class="carousel-indicators" style="margin-bottom: .25rem;">
-                                        {% for image in trek_images %}
-                                            <button type="button" data-bs-target="#trek-carousel-{{ trek.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Photo {{ forloop.counter }}"></button>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="fw-bold card-title mb-0">
-                                    <a href="{% url 'trek_expedition_detail' trek.pk %}" class="text-decoration-none text-dark">{{ trek.title }}</a>
-                                </h5>
-                                <span class="badge bg-info text-dark text-capitalize">
+<section class="adventure-section" id="adventures">
+
+    <div class="section-inner">
+
+        <div class="section-heading-row">
+
+            <div>
+                <p class="section-eyebrow">Treks &amp; Events</p>
+
+                <h2 class="section-title">
+                    Discover Treks &amp; Events
+                </h2>
+            </div>
+
+            <a href="{% url 'trek_list' %}" class="view-all">
+                View all
+                <i class="bi bi-arrow-right"></i>
+            </a>
+
+        </div>
+
+
+        <div class="adventure-grid" id="adventureGrid">
+
+            <!-- =================================================
+                 REAL DJANGO TREKS
+                 ================================================= -->
+
+            {% for trek in treks %}
+
+                <article
+                    class="adventure-card adventure-item"
+                    data-kind="trek"
+                    data-destination="{{ trek.destination|lower }}"
+                    data-title="{{ trek.title|lower }}"
+                    data-date="{{ trek.date|date:'Y-m-d' }}"
+                    data-difficulty="{{ trek.difficulty }}"
+                >
+
+                    <div class="card-image-wrap">
+
+                        {% with trek_images=trek.images.all %}
+
+                            {% if trek_images %}
+
+                                {% for image in trek_images %}
+                                    {% if forloop.first %}
+                                        <a href="{% url 'trek_expedition_detail' trek.pk %}">
+                                            <img
+                                                src="{{ image.image.url }}"
+                                                alt="{{ trek.title }}"
+                                                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                                            >
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                            {% else %}
+
+                                <!-- Elegant mountain fallback when a trek
+                                     doesn't have an uploaded image -->
+                                <svg
+                                    viewBox="0 0 800 450"
+                                    width="100%"
+                                    height="100%"
+                                    preserveAspectRatio="xMidYMid slice"
+                                    aria-label="Mountain landscape"
+                                    role="img"
+                                >
+                                    <defs>
+                                        <linearGradient id="fallbackSky{{ trek.pk }}" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#dceaf2"/>
+                                            <stop offset="100%" stop-color="#7995aa"/>
+                                        </linearGradient>
+                                    </defs>
+
+                                    <rect width="800" height="450" fill="url(#fallbackSky{{ trek.pk }})"/>
+
+                                    <path
+                                        fill="#b3c9d8"
+                                        d="M0 330 L150 170 L250 285 L370 110 L510 290 L620 155 L800 315 V450 H0Z"
+                                    />
+
+                                    <path
+                                        fill="#66859d"
+                                        d="M0 365 L180 245 L300 335 L440 205 L560 330 L690 220 L800 320 V450 H0Z"
+                                    />
+
+                                    <path
+                                        fill="#24475f"
+                                        d="M0 400 L110 330 L205 390 L320 315 L440 400 L570 325 L680 390 L800 345 V450 H0Z"
+                                    />
+                                </svg>
+
+                            {% endif %}
+
+                        {% endwith %}
+
+                        <div class="image-overlay"></div>
+
+
+                        <div class="date-badge">
+                            <strong>{{ trek.date|date:"d" }}</strong>
+                            <span>{{ trek.date|date:"M" }}</span>
+                        </div>
+
+                        <span class="type-badge">
+                            Trek
+                        </span>
+
+                    </div>
+
+
+                    <div class="card-body-custom">
+
+                        <h3 class="card-title-custom">
+                            <a href="{% url 'trek_expedition_detail' trek.pk %}">
+                                {{ trek.title }}
+                            </a>
+                        </h3>
+
+                        <div class="card-meta">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>{{ trek.destination }}</span>
+                        </div>
+
+
+                        <div class="card-divider"></div>
+
+
+                        <div class="card-bottom">
+
+                            <div>
+                                <span class="difficulty {{ trek.difficulty }}">
                                     {{ trek.get_difficulty_display }}
                                 </span>
                             </div>
-                            <p class="text-secondary small mb-3">
-                                <i class="bi bi-geo-alt-fill me-1"></i>{{ trek.destination }}<br>
-                                <i class="bi bi-calendar-event me-1"></i>{{ trek.date|date:"M j, Y" }}
-                            </p>
-                            <p class="small text-muted mb-2">
-                                <strong>Organized by:</strong> {{ trek.created_by.username }}<br>
-                                <strong>Participants:</strong>
-                                {{ trek.participants.count }} / {{ trek.max_participants }}
-                            </p>
-                        </div>
 
-                        <div class="mt-3 pt-3 border-top">
-                            {% if user.is_authenticated %}
-                                <!-- BUG 8 FIX: use annotated user_has_joined instead of
-                                     trek.participants.all which fires a DB query per card -->
-                                {% if trek.user_has_joined %}
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-success small fw-bold">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Signed Up
-                                        </span>
-                                        <form action="{% url 'leave_trek' trek.pk %}" method="post" class="d-inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                                                Leave
-                                            </button>
-                                        </form>
-                                    </div>
-                                {% elif trek.is_full %}
-                                    <button class="btn btn-sm btn-secondary rounded-pill w-100" disabled>
-                                        Trek Full
-                                    </button>
-                                {% else %}
-                                    <form action="{% url 'join_trek' trek.pk %}" method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-primary rounded-pill w-100 fw-bold">
-                                            Join Trek
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            {% else %}
-                                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-primary rounded-pill w-100">
-                                    Log in to Join
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="alert alert-info rounded-4 p-4 text-center">
-        <p class="mb-0">No treks found. Check back soon!</p>
-    </div>
-{% endif %}
-
-<!-- BUG 2 FIX: events section was passed by trek_list view but never rendered -->
-{% if events %}
-    <h3 class="fw-bold mt-5 mb-4">
-        <i class="bi bi-journal-richtext text-primary me-2"></i>Community Events
-    </h3>
-    <div class="row g-4">
-        {% for event in events %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                    {% with event.images.all as event_images %}
-                        {% if event_images %}
-                            <div id="event-carousel-{{ event.pk }}" class="carousel slide">
-                                <div class="carousel-inner">
-                                    {% for image in event_images %}
-                                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                            <a href="{% url 'trek_detail' event.pk %}" class="d-block">
-                                                <img src="{{ image.image.url }}" class="d-block w-100" style="height: 180px; object-fit: cover;" alt="{{ event.title }} - photo {{ forloop.counter }}">
-                                            </a>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                {% if event_images|length > 1 %}
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#event-carousel-{{ event.pk }}" data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Previous photo</span>
-                                    </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#event-carousel-{{ event.pk }}" data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Next photo</span>
-                                    </button>
-                                    <div class="carousel-indicators" style="margin-bottom: .25rem;">
-                                        {% for image in event_images %}
-                                            <button type="button" data-bs-target="#event-carousel-{{ event.pk }}" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Photo {{ forloop.counter }}"></button>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
-                        <div>
-                            <h5 class="fw-bold mb-2">{{ event.title }}</h5>
-                            <p class="text-secondary small mb-2">
-                                <i class="bi bi-geo-alt-fill me-1"></i>{{ event.destination }}<br>
-                                <i class="bi bi-calendar-event me-1"></i>{{ event.date|date:"M j, Y" }}
-                            </p>
-                            <p class="text-muted small mb-0">
-                                {{ event.description|truncatewords:20 }}
-                            </p>
-                        </div>
-                        <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
-                            <span class="small text-muted">
-                                <i class="bi bi-heart-fill text-danger me-1"></i>{{ event.total_likes }} likes
+                            <span class="participants">
+                                <i class="bi bi-people"></i>
+                                {{ trek.participants.count }}/{{ trek.max_participants }}
                             </span>
-                            <a href="{% url 'trek_detail' event.pk %}"
-                               class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                View Event
+
+                            <a
+                                href="{% url 'trek_expedition_detail' trek.pk %}"
+                                class="card-arrow"
+                                aria-label="View {{ trek.title }}"
+                            >
+                                <i class="bi bi-arrow-up-right"></i>
                             </a>
+
                         </div>
+
                     </div>
+
+                </article>
+
+            {% endfor %}
+
+
+            <!-- =================================================
+                 REAL DJANGO EVENTS
+                 ================================================= -->
+
+            {% for event in events %}
+
+                <article
+                    class="adventure-card adventure-item"
+                    data-kind="event"
+                    data-destination="{{ event.destination|lower }}"
+                    data-title="{{ event.title|lower }}"
+                    data-date="{{ event.date|date:'Y-m-d' }}"
+                    data-difficulty="event"
+                >
+
+                    <div class="card-image-wrap">
+
+                        {% with event_images=event.images.all %}
+
+                            {% if event_images %}
+
+                                {% for image in event_images %}
+                                    {% if forloop.first %}
+                                        <a href="{% url 'trek_detail' event.pk %}">
+                                            <img
+                                                src="{{ image.image.url }}"
+                                                alt="{{ event.title }}"
+                                                loading="lazy"
+                                            >
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                            {% else %}
+
+                                <svg
+                                    viewBox="0 0 800 450"
+                                    width="100%"
+                                    height="100%"
+                                    preserveAspectRatio="xMidYMid slice"
+                                    aria-label="Mountain landscape"
+                                    role="img"
+                                >
+                                    <defs>
+                                        <linearGradient id="eventFallback{{ event.pk }}" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#e6eff5"/>
+                                            <stop offset="100%" stop-color="#7894a9"/>
+                                        </linearGradient>
+                                    </defs>
+
+                                    <rect width="800" height="450" fill="url(#eventFallback{{ event.pk }})"/>
+
+                                    <path
+                                        fill="#c0d1dc"
+                                        d="M0 335 L140 190 L250 300 L395 115 L520 295 L650 155 L800 300 V450 H0Z"
+                                    />
+
+                                    <path
+                                        fill="#6f8ba1"
+                                        d="M0 370 L170 260 L290 350 L445 220 L570 340 L700 245 L800 330 V450 H0Z"
+                                    />
+
+                                    <path
+                                        fill="#1d4059"
+                                        d="M0 405 L130 345 L230 395 L350 330 L470 405 L610 340 L720 395 L800 355 V450 H0Z"
+                                    />
+                                </svg>
+
+                            {% endif %}
+
+                        {% endwith %}
+
+                        <div class="image-overlay"></div>
+
+
+                        <div class="date-badge">
+                            <strong>{{ event.date|date:"d" }}</strong>
+                            <span>{{ event.date|date:"M" }}</span>
+                        </div>
+
+                        <span class="type-badge">
+                            Event
+                        </span>
+
+                    </div>
+
+
+                    <div class="card-body-custom">
+
+                        <h3 class="card-title-custom">
+                            <a href="{% url 'trek_detail' event.pk %}">
+                                {{ event.title }}
+                            </a>
+                        </h3>
+
+                        <div class="card-meta">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>{{ event.destination }}</span>
+                        </div>
+
+                        <p class="event-description">
+                            {{ event.description|truncatewords:14 }}
+                        </p>
+
+
+                        <div class="card-divider"></div>
+
+
+                        <div class="card-bottom">
+
+                            <span class="event-likes">
+                                <i class="bi bi-heart"></i>
+                                {{ event.total_likes }} likes
+                            </span>
+
+                            <a
+                                href="{% url 'trek_detail' event.pk %}"
+                                class="card-arrow"
+                                aria-label="View {{ event.title }}"
+                            >
+                                <i class="bi bi-arrow-up-right"></i>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+
+            {% if not treks and not events %}
+
+                <div class="empty-state">
+
+                    <i class="bi bi-compass"></i>
+
+                    <h3>No adventures found</h3>
+
+                    <p>
+                        There aren't any treks or events available right now.
+                        Check back soon for the next expedition.
+                    </p>
+
                 </div>
+
+            {% endif %}
+
+
+            <!-- Client-side filter empty state -->
+            <div
+                class="empty-state"
+                id="filterEmpty"
+                style="display:none;"
+            >
+                <i class="bi bi-binoculars"></i>
+
+                <h3>No matching adventures</h3>
+
+                <p>
+                    Try another destination, difficulty, or date.
+                </p>
+
             </div>
-        {% endfor %}
+
+        </div>
+
+
+        <!-- =====================================================
+             VALUES
+             ===================================================== -->
+
+        <div class="values-strip">
+
+            <div class="value-item">
+                <div class="value-icon">
+                    <i class="bi bi-signpost-2"></i>
+                </div>
+                <div class="value-title">Handpicked</div>
+                <p class="value-text">
+                    Adventures worth taking.
+                </p>
+            </div>
+
+            <div class="value-item">
+                <div class="value-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="value-title">Community</div>
+                <p class="value-text">
+                    Meet people who explore.
+                </p>
+            </div>
+
+            <div class="value-item">
+                <div class="value-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="value-title">Adventure</div>
+                <p class="value-text">
+                    Push your limits.
+                </p>
+            </div>
+
+            <div class="value-item">
+                <div class="value-icon">
+                    <i class="bi bi-camera"></i>
+                </div>
+                <div class="value-title">Memories</div>
+                <p class="value-text">
+                    Stories that stay with you.
+                </p>
+            </div>
+
+        </div>
+
     </div>
-{% endif %}
+
+</section>
 
 {% endblock %}
 
+
 {% block extra_js %}
-{% if title == 'All Treks' or not title %}
-<script src="{% static 'js/karakoram.js' %}" defer></script>
-{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("adventureSearch");
+    const searchInput = form ? form.querySelector('input[name="q"]') : null;
+    const difficultySelect = form ? form.querySelector('select[name="difficulty"]') : null;
+    const dateFilter = document.getElementById("dateFilter");
+
+    const cards = Array.from(
+        document.querySelectorAll(".adventure-item")
+    );
+
+    const emptyState = document.getElementById("filterEmpty");
+
+    function normalize(value) {
+        return (value || "").toLowerCase().trim();
+    }
+
+    function filterCards() {
+
+        const query = normalize(
+            searchInput ? searchInput.value : ""
+        );
+
+        const difficulty = difficultySelect
+            ? normalize(difficultySelect.value)
+            : "";
+
+        const dateMode = dateFilter
+            ? dateFilter.value
+            : "any";
+
+        const now = new Date();
+
+        const startOfMonth = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            1
+        );
+
+        const nextThreeMonths = new Date(
+            now.getFullYear(),
+            now.getMonth() + 3,
+            now.getDate()
+        );
+
+        let visibleCount = 0;
+
+        cards.forEach(function (card) {
+
+            const destination =
+                normalize(card.dataset.destination);
+
+            const title =
+                normalize(card.dataset.title);
+
+            const cardDifficulty =
+                normalize(card.dataset.difficulty);
+
+            const dateValue =
+                card.dataset.date;
+
+            let matchesSearch =
+                !query ||
+                destination.includes(query) ||
+                title.includes(query);
+
+            let matchesDifficulty =
+                !difficulty ||
+                cardDifficulty === difficulty;
+
+            let matchesDate = true;
+
+            if (dateMode !== "any" && dateValue) {
+
+                const cardDate =
+                    new Date(dateValue + "T00:00:00");
+
+                if (dateMode === "month") {
+                    matchesDate =
+                        cardDate >= startOfMonth &&
+                        cardDate.getMonth() === now.getMonth() &&
+                        cardDate.getFullYear() === now.getFullYear();
+                }
+
+                if (dateMode === "next3") {
+                    matchesDate =
+                        cardDate >= now &&
+                        cardDate <= nextThreeMonths;
+                }
+            }
+
+            const visible =
+                matchesSearch &&
+                matchesDifficulty &&
+                matchesDate;
+
+            card.style.display =
+                visible ? "" : "none";
+
+            if (visible) {
+                visibleCount++;
+            }
+        });
+
+        if (emptyState) {
+            emptyState.style.display =
+                visibleCount === 0 ? "" : "none";
+        }
+    }
+
+    /*
+     * Keep normal Django GET filtering working.
+     *
+     * The destination + difficulty fields are submitted to Django,
+     * because the current trek_list view already supports:
+     *
+     * ?q=
+     * ?difficulty=
+     *
+     * Date filtering is handled client-side because the existing
+     * Django view does not currently accept a date parameter.
+     */
+    if (form) {
+
+        form.addEventListener("submit", function () {
+
+            /*
+             * Don't block the normal Django form submission.
+             * The server handles q and difficulty.
+             */
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener(
+            "input",
+            filterCards
+        );
+    }
+
+    if (difficultySelect) {
+        difficultySelect.addEventListener(
+            "change",
+            filterCards
+        );
+    }
+
+    if (dateFilter) {
+        dateFilter.addEventListener(
+            "change",
+            filterCards
+        );
+    }
+
+});
+</script>
+
 {% endblock %}
