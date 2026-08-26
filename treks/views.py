@@ -9,6 +9,7 @@ from django.db.models import Exists, OuterRef
 
 from .models import Trek, TrekEvent, Comment, TrekImage, TrekEventImage
 from .forms import TrekForm, TrekEventForm
+from .karakoram_view import PEAKS as KARAKORAM_PEAKS
 
 
 # Guard function: strictly checks if user is authenticated staff
@@ -161,6 +162,7 @@ def trek_list(request):
         'title': 'All Treks',
         'query': query,
         'difficulty': difficulty,
+        'peaks': KARAKORAM_PEAKS,
     })
 
 
