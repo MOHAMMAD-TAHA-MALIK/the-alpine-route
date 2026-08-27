@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Exists, OuterRef
 
 from .models import Trek, TrekEvent, Comment, TrekImage, TrekEventImage
@@ -15,6 +16,26 @@ from .forms import TrekForm, TrekEventForm
 # Guard function: strictly checks if user is authenticated staff
 def is_staff_user(user):
     return user.is_authenticated and user.is_staff
+
+
+def _redirect_target(request, default='trek_list'):
+    """
+    BUG FIX: join_trek/leave_trek used to always redirect to trek_list,
+    even when the action was submitted from a trek's own detail page or
+    from the profile page — bouncing the user away from where they were.
+
+    Reads a 'next' field from the POST body and redirects there instead,
+    falling back to trek_list. url_has_allowed_host_and_scheme guards
+    against this being used as an open redirect.
+    """
+    next_url = request.POST.get('next')
+    if next_url and url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect(next_url)
+    return redirect(default)
 
 
 # --- Authentication & User Profile Views ---
@@ -111,16 +132,16 @@ def join_trek(request, pk):
     trek = get_object_or_404(Trek, pk=pk)
     if trek.created_by == request.user:
         messages.error(request, "You can't join a trek you organized.")
-        return redirect('trek_list')
+        return _redirect_target(request)
     if trek.participants.filter(pk=request.user.pk).exists():
         messages.info(request, "You're already in this trek.")
-        return redirect('trek_list')
+        return _redirect_target(request)
     if trek.is_full:
         messages.error(request, f"Sorry, {trek.title} is already at full capacity.")
     else:
         trek.participants.add(request.user)
         messages.success(request, f"You have joined {trek.title}!")
-    return redirect('trek_list')
+    return _redirect_target(request)
 
 
 @login_required
@@ -129,7 +150,7 @@ def leave_trek(request, pk):
     trek = get_object_or_404(Trek, pk=pk)
     trek.participants.remove(request.user)
     messages.info(request, f"You have left {trek.title}.")
-    return redirect('trek_list')
+    return _redirect_target(request)
 
 
 def trek_list(request):

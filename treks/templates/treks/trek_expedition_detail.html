@@ -63,6 +63,7 @@
             {% if user_has_joined %}
                 <form action="{% url 'leave_trek' trek.pk %}" method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'trek_expedition_detail' trek.pk %}">
                     <button type="submit" class="btn btn-outline-danger rounded-pill px-4">Leave Trek</button>
                 </form>
             {% elif trek.is_full %}
@@ -70,6 +71,7 @@
             {% else %}
                 <form action="{% url 'join_trek' trek.pk %}" method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'trek_expedition_detail' trek.pk %}">
                     <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Join Trek</button>
                 </form>
             {% endif %}

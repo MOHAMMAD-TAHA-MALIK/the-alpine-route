@@ -50,6 +50,7 @@
                                     <small class="text-secondary">Organized by {{ trek.created_by.username }}</small>
                                     <form action="{% url 'leave_trek' trek.pk %}" method="post">
                                         {% csrf_token %}
+                                        <input type="hidden" name="next" value="{% url 'profile' %}">
                                         <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Leave Trek</button>
                                     </form>
                                 </div>
@@ -66,26 +67,43 @@
         {% endif %}
 
         <!-- Staff/Guide Section for Created Treks -->
-        {% if user.is_staff and created_treks %}
-            <h3 class="fw-bold mb-3"><i class="bi bi-journal-plus me-2 text-warning"></i>Treks You Organized ({{ created_treks.count }})</h3>
-            <div class="list-group shadow-sm rounded-4 mb-4">
-                {% for trek in created_treks %}
-                    <a href="{% url 'trek_expedition_detail' trek.pk %}" class="list-group-item list-group-item-action p-3 border-0 d-flex justify-content-between align-items-center text-decoration-none">
-                        <div class="d-flex align-items-center gap-3">
-                            {% with trek.images.all|first as trek_image %}
-                                {% if trek_image %}
-                                    <img src="{{ trek_image.image.url }}" class="rounded-3" style="width: 56px; height: 56px; object-fit: cover;" alt="{{ trek.title }}">
-                                {% endif %}
-                            {% endwith %}
-                            <div>
-                                <strong class="fs-5 text-dark">{{ trek.title }}</strong>
-                                <div class="text-secondary small">{{ trek.destination }} — {{ trek.date|date:"M j, Y" }}</div>
-                            </div>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">{{ trek.participants.count }} / {{ trek.max_participants }} Participants</span>
+        {% if user.is_staff %}
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h3 class="fw-bold mb-0"><i class="bi bi-journal-plus me-2 text-warning"></i>Treks You Organized ({{ created_treks.count }})</h3>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'create_trek' %}" class="btn btn-sm btn-primary rounded-pill px-3">
+                        <i class="bi bi-plus-lg me-1"></i>New Trek
                     </a>
-                {% endfor %}
+                    <a href="{% url 'create_trek_event' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        <i class="bi bi-plus-lg me-1"></i>New Event
+                    </a>
+                </div>
             </div>
+
+            {% if created_treks %}
+                <div class="list-group shadow-sm rounded-4 mb-4">
+                    {% for trek in created_treks %}
+                        <a href="{% url 'trek_expedition_detail' trek.pk %}" class="list-group-item list-group-item-action p-3 border-0 d-flex justify-content-between align-items-center text-decoration-none">
+                            <div class="d-flex align-items-center gap-3">
+                                {% with trek.images.all|first as trek_image %}
+                                    {% if trek_image %}
+                                        <img src="{{ trek_image.image.url }}" class="rounded-3" style="width: 56px; height: 56px; object-fit: cover;" alt="{{ trek.title }}">
+                                    {% endif %}
+                                {% endwith %}
+                                <div>
+                                    <strong class="fs-5 text-dark">{{ trek.title }}</strong>
+                                    <div class="text-secondary small">{{ trek.destination }} — {{ trek.date|date:"M j, Y" }}</div>
+                                </div>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">{{ trek.participants.count }} / {{ trek.max_participants }} Participants</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning rounded-4 p-4 mb-4">
+                    <p class="mb-0">You haven't organized any treks yet — use "New Trek" above to publish one.</p>
+                </div>
+            {% endif %}
         {% endif %}
 
     </div>
