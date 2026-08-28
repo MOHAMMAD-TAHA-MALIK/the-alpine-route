@@ -4,43 +4,35 @@
 {% block title %}{{ title|default:"The Alpine Route" }}{% endblock %}
 
 {% block extra_css %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-
 <style>
     /* =========================================================
        ALPINE ROUTE — HOMEPAGE
+       (recolored to the dark "Alpine Route" design system that
+       lives in base.html — see tailwind.config there for the
+       alpine-* color tokens this page's markup also uses directly)
        ========================================================= */
 
     :root {
-        --alpine-ink: #10263d;
-        --alpine-navy: #173b5c;
-        --alpine-blue: #2e5f8d;
-        --alpine-steel: #6f879c;
-        --alpine-mist: #e9f0f5;
-        --alpine-snow: #f8fafb;
-        --alpine-border: #d9e2e9;
-        --alpine-muted: #718294;
+        --alpine-ink: #e2e8f0;
+        --alpine-navy: #93c5fd;
+        --alpine-blue: #93c5fd;
+        --alpine-steel: #94a3b8;
+        --alpine-mist: #233845;
+        --alpine-snow: #111827;
+        --alpine-border: rgba(255,255,255,.1);
+        --alpine-muted: #94a3b8;
         --alpine-white: #ffffff;
     }
 
     body {
         background: var(--alpine-snow) !important;
         color: var(--alpine-ink);
-        font-family: "DM Sans", sans-serif;
+        font-family: "Inter", sans-serif;
     }
 
-    /* Remove Bootstrap's normal main spacing on this page.
-       The hero needs to touch the viewport edges. */
-    main.container {
-        max-width: none !important;
-        width: 100%;
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
+    /* base.html's <main> has no Bootstrap .container / max-width of its
+       own, so the hero below is free to touch the viewport edges without
+       needing an override here. */
 
     /* =========================================================
        HERO
@@ -48,18 +40,29 @@
 
     .alpine-hero {
         position: relative;
-        min-height: 560px;
+        min-height: 620px;
         overflow: visible;
-        isolation: isolate;
+        background: #111827;
+    }
 
-        background:
-            linear-gradient(
-                180deg,
-                #f8fafb 0%,
-                #f3f7fa 25%,
-                #dce8f0 57%,
-                #9fb6c8 100%
-            );
+    .hero-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+    }
+
+    .hero-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(to bottom, rgba(17,24,39,.35) 0%, rgba(17,24,39,.88) 100%);
     }
 
     .hero-content {
@@ -67,7 +70,7 @@
         z-index: 8;
         max-width: 760px;
         margin: 0 auto;
-        padding: 75px 24px 155px;
+        padding: 115px 24px 155px;
         text-align: center;
     }
 
@@ -88,36 +91,36 @@
         content: "";
         width: 36px;
         height: 1px;
-        background: #7892a8;
+        background: rgba(255,255,255,.5);
         opacity: .7;
     }
 
     .hero-title {
         margin: 0;
-        color: #112940;
-        font-family: "DM Serif Display", Georgia, serif;
+        color: #ffffff;
+        font-family: "Playfair Display", Georgia, serif;
         font-size: clamp(3.4rem, 7vw, 6.8rem);
-        line-height: .91;
-        letter-spacing: -.045em;
-        font-weight: 400;
+        line-height: .95;
+        letter-spacing: -.02em;
+        font-weight: 600;
     }
 
     .hero-title span {
         display: block;
-        color: #2d608e;
+        color: var(--alpine-blue);
     }
 
     .hero-description {
         max-width: 590px;
         margin: 25px auto 30px;
-        color: #344c62;
+        color: rgba(255,255,255,.82);
         font-size: 1.05rem;
         line-height: 1.75;
     }
 
     .hero-description strong {
         font-weight: 700;
-        color: var(--alpine-ink);
+        color: #ffffff;
     }
 
     .hero-cta {
@@ -126,76 +129,23 @@
         gap: 10px;
         min-height: 52px;
         padding: 0 26px;
-        border-radius: 12px;
-        background: #12314d;
-        color: white !important;
+        border-radius: 999px;
+        background: var(--alpine-blue);
+        color: #111827 !important;
         text-decoration: none;
         font-weight: 700;
-        box-shadow: 0 12px 30px rgba(16, 38, 61, .18);
+        box-shadow: 0 12px 30px rgba(5, 15, 30, .35);
         transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
     }
 
     .hero-cta:hover {
-        background: #204f77;
+        background: #bfdcfc;
         transform: translateY(-2px);
-        box-shadow: 0 16px 34px rgba(16, 38, 61, .24);
+        box-shadow: 0 16px 34px rgba(5, 15, 30, .4);
     }
 
     .hero-cta i {
         font-size: 1.05rem;
-    }
-
-    /* =========================================================
-       MOUNTAIN SVG
-       ========================================================= */
-
-    .mountain-art {
-        position: absolute;
-        inset: auto 0 0;
-        width: 100%;
-        height: 355px;
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    .mountain-art svg {
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
-
-    .mountain-back {
-        fill: #dce7ee;
-    }
-
-    .mountain-mid {
-        fill: #b7cbd9;
-    }
-
-    .mountain-front {
-        fill: #718da3;
-    }
-
-    .mountain-dark {
-        fill: #17344d;
-    }
-
-    .mountain-line {
-        fill: none;
-        stroke: #6c879d;
-        stroke-width: 1.2;
-        opacity: .46;
-    }
-
-    .mountain-line-light {
-        fill: none;
-        stroke: #edf4f8;
-        stroke-width: 1.15;
-        opacity: .8;
-    }
-
-    .pine {
-        fill: #123149;
     }
 
     /* =========================================================
@@ -212,79 +162,137 @@
     }
 
     .hero-search {
-        display: grid;
-        grid-template-columns: 1.45fr 1fr 1fr auto;
-        gap: 12px;
-        padding: 16px;
-        border: 1px solid rgba(255,255,255,.9);
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 12px 14px;
+        border: 1px solid rgba(255,255,255,.1);
         border-radius: 18px;
-        background: rgba(255,255,255,.94);
+        background: rgba(17,24,39,.85);
         backdrop-filter: blur(18px);
         box-shadow:
-            0 22px 55px rgba(23, 59, 92, .16),
-            0 3px 12px rgba(23, 59, 92, .06);
+            0 22px 55px rgba(2, 6, 14, .45),
+            0 3px 12px rgba(2, 6, 14, .25);
     }
 
     .search-field {
         position: relative;
+        flex: 1 1 240px;
     }
 
-    .search-field i {
+    .search-field.search-field-select {
+        flex: 0 1 180px;
+    }
+
+    .search-field > i {
         position: absolute;
-        left: 17px;
+        left: 16px;
         top: 50%;
         transform: translateY(-50%);
-        color: #55718a;
+        color: var(--alpine-muted);
         z-index: 2;
+        pointer-events: none;
     }
 
     .search-field input,
     .search-field select {
         width: 100%;
-        height: 48px;
-        padding: 0 16px 0 46px;
-        border: 1px solid #dce4ea;
+        height: 46px;
+        padding: 0 16px 0 44px;
+        border: 1px solid rgba(255,255,255,.12);
         border-radius: 11px;
-        background: #fff;
-        color: #183149;
+        background: #1a2634;
+        color: #e2e8f0;
         font-family: inherit;
-        font-size: .92rem;
+        font-size: .88rem;
         outline: none;
         appearance: auto;
         transition: border-color .2s ease, box-shadow .2s ease;
     }
 
     .search-field select {
-        padding-left: 44px;
+        padding-left: 42px;
+        padding-right: 30px;
         cursor: pointer;
+    }
+
+    .search-field input::placeholder {
+        color: var(--alpine-muted);
     }
 
     .search-field input:focus,
     .search-field select:focus {
-        border-color: #6c8ca8;
-        box-shadow: 0 0 0 4px rgba(62, 103, 139, .1);
+        border-color: var(--alpine-blue);
+        box-shadow: 0 0 0 4px rgba(147, 197, 253, .18);
     }
 
-    .search-button {
-        min-width: 155px;
+    /* The magnifying-glass icon in the text field doubles as the
+       real submit control, so there's no separate "Search" button
+       taking up room in the bar. */
+    .search-submit {
+        position: absolute;
+        left: 4px;
+        top: 4px;
+        bottom: 4px;
+        width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border: 0;
-        border-radius: 11px;
-        background: #153650;
-        color: #fff;
-        font-family: inherit;
-        font-weight: 700;
-        padding: 0 22px;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--alpine-muted);
         cursor: pointer;
-        transition: background .2s ease, transform .2s ease;
+        transition: color .2s ease, background .2s ease;
     }
 
-    .search-button:hover {
-        background: #234f75;
-        transform: translateY(-1px);
+    .search-submit:hover,
+    .search-submit:focus-visible {
+        color: #111827;
+        background: var(--alpine-blue);
     }
 
-    .search-button i {
-        margin-left: 8px;
+    /* Quick-filter pills — a second, one-tap way to set the same
+       "difficulty" field the dropdown above already controls. */
+    .hero-search-pills {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+    }
+
+    .hero-search-pills-divider {
+        width: 1px;
+        align-self: stretch;
+        background: rgba(255,255,255,.15);
+        margin: 2px 4px;
+    }
+
+    .difficulty-pill {
+        border: 1px solid rgba(255,255,255,.25);
+        background: transparent;
+        color: #fff;
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        padding: 0 16px;
+        height: 46px;
+        border-radius: 999px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background .2s ease, color .2s ease, border-color .2s ease;
+    }
+
+    .difficulty-pill:hover {
+        border-color: rgba(255,255,255,.5);
+    }
+
+    .difficulty-pill.is-active {
+        background: var(--alpine-blue);
+        color: #111827;
+        border-color: var(--alpine-blue);
     }
 
     /* =========================================================
@@ -294,13 +302,7 @@
     .adventure-section {
         position: relative;
         padding: 112px 24px 65px;
-        background:
-            radial-gradient(
-                circle at 20% 0%,
-                rgba(205, 220, 230, .25),
-                transparent 30%
-            ),
-            #f8fafb;
+        background: #111827;
     }
 
     .section-inner {
@@ -318,7 +320,7 @@
 
     .section-eyebrow {
         margin: 0 0 7px;
-        color: #3e6688;
+        color: var(--alpine-blue);
         font-size: .74rem;
         font-weight: 700;
         letter-spacing: .2em;
@@ -327,18 +329,18 @@
 
     .section-title {
         margin: 0;
-        font-family: "DM Serif Display", Georgia, serif;
+        font-family: "Playfair Display", Georgia, serif;
         font-size: clamp(2rem, 4vw, 3rem);
-        font-weight: 400;
-        letter-spacing: -.025em;
-        color: #10263d;
+        font-weight: 600;
+        letter-spacing: -.01em;
+        color: #ffffff;
     }
 
     .view-all {
         display: inline-flex;
         align-items: center;
         gap: 9px;
-        color: #173f62;
+        color: var(--alpine-blue);
         text-decoration: none;
         font-size: .9rem;
         font-weight: 700;
@@ -359,18 +361,18 @@
 
     .adventure-grid {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 22px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 26px;
     }
 
     .adventure-card {
         position: relative;
         min-width: 0;
         overflow: hidden;
-        border: 1px solid #dce4ea;
+        border: 1px solid rgba(255,255,255,.08);
         border-radius: 17px;
-        background: white;
-        box-shadow: 0 8px 24px rgba(26, 51, 73, .08);
+        background: #2a3b4a;
+        box-shadow: 0 8px 24px rgba(2, 6, 14, .35);
         transition:
             transform .25s ease,
             box-shadow .25s ease,
@@ -379,16 +381,16 @@
 
     .adventure-card:hover {
         transform: translateY(-6px);
-        border-color: #b9cbd8;
-        box-shadow: 0 18px 38px rgba(26, 51, 73, .14);
+        border-color: rgba(147, 197, 253, .35);
+        box-shadow: 0 18px 38px rgba(2, 6, 14, .5);
     }
 
     .card-image-wrap {
         position: relative;
-        height: 225px;
+        height: 235px;
         overflow: hidden;
         background:
-            linear-gradient(145deg, #dce8ef, #7995aa);
+            linear-gradient(145deg, #233845, #111827);
     }
 
     .card-image-wrap img {
@@ -403,8 +405,8 @@
         transform: scale(1.045);
     }
 
-    /* Per-card image carousel — fills the same 225px slot the
-       single fallback <img> uses, sized down for a small thumbnail. */
+    /* Per-card image carousel — fills the same slot the single
+       fallback <img> uses, sized down for a small thumbnail. */
     .card-image-carousel,
     .card-image-carousel .carousel-inner,
     .card-image-carousel .carousel-item {
@@ -439,7 +441,7 @@
     .card-image-carousel .carousel-control-next-icon {
         width: 1.6rem;
         height: 1.6rem;
-        background-color: rgba(9, 29, 46, .55);
+        background-color: rgba(9, 15, 24, .6);
         background-size: 60%;
         border-radius: 50%;
         padding: 6px;
@@ -466,68 +468,57 @@
         inset: 0;
         background: linear-gradient(
             180deg,
-            rgba(9, 29, 46, .04) 35%,
-            rgba(9, 29, 46, .48) 100%
+            rgba(9, 15, 24, .05) 40%,
+            rgba(9, 15, 24, .65) 100%
         );
         pointer-events: none;
     }
 
-    .date-badge {
+    /* Difficulty badge (treks) / type badge (events) — one badge,
+       top-left of the image, colored dot + label. */
+    .type-badge {
         position: absolute;
         left: 14px;
         top: 14px;
-        width: 52px;
-        height: 58px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        z-index: 2;
+        display: inline-flex;
         align-items: center;
-        border-radius: 10px;
-        background: rgba(17, 45, 69, .92);
-        color: white;
-        line-height: 1;
-        box-shadow: 0 8px 18px rgba(5, 24, 39, .18);
-        backdrop-filter: blur(8px);
-    }
-
-    .date-badge strong {
-        font-size: 1.2rem;
-        font-weight: 700;
-    }
-
-    .date-badge span {
-        margin-top: 5px;
-        font-size: .64rem;
-        letter-spacing: .12em;
-        font-weight: 700;
-        opacity: .86;
-    }
-
-    .type-badge {
-        position: absolute;
-        right: 14px;
-        top: 14px;
-        padding: 6px 10px;
+        gap: 7px;
+        padding: 6px 12px 6px 10px;
         border-radius: 999px;
-        background: rgba(255,255,255,.92);
-        color: #173b5c;
-        font-size: .65rem;
+        background: rgba(17, 24, 39, .82);
+        backdrop-filter: blur(6px);
+        color: #fff;
+        font-size: .64rem;
         font-weight: 800;
         letter-spacing: .09em;
         text-transform: uppercase;
-        box-shadow: 0 5px 14px rgba(7, 27, 44, .12);
+        box-shadow: 0 5px 14px rgba(2, 6, 14, .35);
     }
 
+    .type-badge .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+    }
+
+    .type-badge.easy .dot { background: #4ade80; }
+    .type-badge.moderate .dot { background: #60a5fa; }
+    .type-badge.hard .dot { background: #f87171; }
+    .type-badge.event .dot { background: #c4b5fd; }
+
     .card-body-custom {
-        padding: 18px 17px 16px;
+        padding: 20px 19px 18px;
     }
 
     .card-title-custom {
-        margin: 0 0 10px;
-        color: #152b40;
-        font-size: 1rem;
-        line-height: 1.35;
-        font-weight: 700;
+        margin: 0 0 8px;
+        font-family: "Playfair Display", Georgia, serif;
+        color: #ffffff;
+        font-size: 1.25rem;
+        line-height: 1.3;
+        font-weight: 600;
     }
 
     .card-title-custom a {
@@ -536,15 +527,16 @@
     }
 
     .card-title-custom a:hover {
-        color: #2e628f;
+        color: var(--alpine-blue);
     }
 
     .card-meta {
         display: flex;
         align-items: flex-start;
-        gap: 7px;
-        min-height: 40px;
-        color: #718294;
+        flex-wrap: wrap;
+        row-gap: 4px;
+        column-gap: 6px;
+        color: var(--alpine-muted);
         font-size: .78rem;
         line-height: 1.45;
     }
@@ -552,13 +544,17 @@
     .card-meta i {
         flex: 0 0 auto;
         margin-top: 2px;
-        color: #4d708d;
+        color: var(--alpine-blue);
+    }
+
+    .card-meta .meta-sep {
+        color: rgba(255,255,255,.25);
     }
 
     .card-divider {
         height: 1px;
         margin: 14px 0 12px;
-        background: #e6ebef;
+        background: rgba(255,255,255,.08);
     }
 
     .card-bottom {
@@ -568,38 +564,24 @@
         gap: 10px;
     }
 
-    .difficulty {
+    .card-bottom-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        color: var(--alpine-muted);
+        font-size: .78rem;
+    }
+
+    .card-bottom-meta span {
         display: inline-flex;
         align-items: center;
-        padding: 5px 10px;
-        border-radius: 999px;
-        font-size: .7rem;
-        font-weight: 800;
-    }
-
-    .difficulty.easy {
-        color: #27654a;
-        background: #e0f3e8;
-    }
-
-    .difficulty.moderate {
-        color: #27628c;
-        background: #dcecf8;
-    }
-
-    .difficulty.hard {
-        color: #934646;
-        background: #f8dfdf;
-    }
-
-    .participants {
-        color: #66798b;
-        font-size: .74rem;
+        gap: 5px;
         white-space: nowrap;
     }
 
-    .participants i {
-        margin-right: 4px;
+    .card-bottom-meta i {
+        color: var(--alpine-muted);
     }
 
     .card-arrow {
@@ -609,34 +591,34 @@
         align-items: center;
         justify-content: center;
         flex: 0 0 auto;
-        border: 1px solid #9ab0c2;
+        border: 1px solid rgba(255,255,255,.25);
         border-radius: 50%;
-        color: #183b5a;
+        color: #fff;
         text-decoration: none;
         transition: all .2s ease;
     }
 
     .card-arrow:hover {
-        color: #fff;
-        background: #173b5c;
-        border-color: #173b5c;
+        color: #111827;
+        background: var(--alpine-blue);
+        border-color: var(--alpine-blue);
     }
 
     .event-description {
         margin-top: 8px;
-        color: #7a8996;
-        font-size: .77rem;
-        line-height: 1.5;
+        color: var(--alpine-muted);
+        font-size: .82rem;
+        line-height: 1.55;
     }
 
     .event-likes {
-        color: #718294;
-        font-size: .73rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
     .event-likes i {
-        color: #718ca2;
-        margin-right: 4px;
+        color: var(--alpine-blue);
     }
 
     /* =========================================================
@@ -646,26 +628,59 @@
     .empty-state {
         grid-column: 1 / -1;
         padding: 55px 20px;
-        border: 1px dashed #bdcbd5;
+        border: 1px dashed rgba(255,255,255,.18);
         border-radius: 18px;
         text-align: center;
-        background: rgba(255,255,255,.7);
+        background: rgba(255,255,255,.03);
     }
 
     .empty-state i {
         font-size: 2.5rem;
-        color: #7c96aa;
+        color: var(--alpine-muted);
     }
 
     .empty-state h3 {
         margin-top: 14px;
-        font-family: "DM Serif Display", Georgia, serif;
-        font-weight: 400;
-        color: #18344e;
+        font-family: "Playfair Display", Georgia, serif;
+        font-weight: 600;
+        color: #ffffff;
     }
 
     .empty-state p {
-        color: #718294;
+        color: var(--alpine-muted);
+    }
+
+    /* =========================================================
+       LOAD MORE
+       ========================================================= */
+
+    .load-more-wrap {
+        display: flex;
+        justify-content: center;
+        margin-top: 44px;
+    }
+
+    .load-more-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255,255,255,.3);
+        color: #fff;
+        background: transparent;
+        padding: 14px 34px;
+        border-radius: 999px;
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .2s ease, border-color .2s ease;
+    }
+
+    .load-more-btn:hover {
+        background: rgba(255,255,255,.1);
+        border-color: rgba(255,255,255,.5);
     }
 
     /* =========================================================
@@ -678,13 +693,13 @@
         padding: 26px 0 0;
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        border-top: 1px solid #dce5eb;
+        border-top: 1px solid rgba(255,255,255,.08);
     }
 
     .value-item {
         text-align: center;
         padding: 0 20px;
-        border-right: 1px solid #dce5eb;
+        border-right: 1px solid rgba(255,255,255,.08);
     }
 
     .value-item:last-child {
@@ -692,13 +707,13 @@
     }
 
     .value-icon {
-        color: #3f6889;
+        color: var(--alpine-blue);
         font-size: 1.25rem;
         margin-bottom: 7px;
     }
 
     .value-title {
-        color: #173b5c;
+        color: #ffffff;
         font-size: .72rem;
         font-weight: 800;
         letter-spacing: .12em;
@@ -707,7 +722,7 @@
 
     .value-text {
         margin: 5px 0 0;
-        color: #7a8996;
+        color: var(--alpine-muted);
         font-size: .76rem;
     }
 
@@ -717,47 +732,30 @@
 
     @media (max-width: 1100px) {
         .adventure-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .hero-search {
-            grid-template-columns: 1.3fr 1fr 1fr;
-        }
-
-        .search-button {
-            grid-column: 1 / -1;
-            height: 48px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 
     @media (max-width: 800px) {
         .alpine-hero {
-            min-height: 650px;
+            min-height: 700px;
         }
 
         .hero-content {
-            padding-top: 60px;
-            padding-bottom: 210px;
+            padding-top: 90px;
+            padding-bottom: 230px;
         }
 
         .hero-title {
             font-size: clamp(3rem, 13vw, 5rem);
         }
 
-        .mountain-art {
-            height: 340px;
+        .search-field {
+            flex-basis: 100%;
         }
 
-        .hero-search {
-            grid-template-columns: 1fr;
-        }
-
-        .search-button {
-            grid-column: auto;
-        }
-
-        .adventure-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        .search-field.search-field-select {
+            flex-basis: calc(50% - 5px);
         }
 
         .values-strip {
@@ -772,11 +770,11 @@
 
     @media (max-width: 560px) {
         .alpine-hero {
-            min-height: 690px;
+            min-height: 760px;
         }
 
         .hero-content {
-            padding: 48px 18px 225px;
+            padding: 78px 18px 250px;
         }
 
         .hero-title {
@@ -794,6 +792,19 @@
         .hero-search {
             padding: 10px;
             border-radius: 15px;
+        }
+
+        .search-field.search-field-select {
+            flex-basis: 100%;
+        }
+
+        .hero-search-pills {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .hero-search-pills-divider {
+            display: none;
         }
 
         .adventure-section {
@@ -829,7 +840,8 @@
         .adventure-card,
         .card-image-wrap img,
         .hero-cta,
-        .search-button {
+        .search-submit,
+        .difficulty-pill {
             transition: none;
         }
     }
@@ -844,6 +856,15 @@
      ========================================================= -->
 
 <section class="alpine-hero">
+
+    <!-- Background photo -->
+    <div class="hero-bg" aria-hidden="true">
+        <img
+            src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=2070&amp;q=80"
+            alt=""
+        >
+    </div>
+    <div class="hero-overlay" aria-hidden="true"></div>
 
     <div class="hero-content">
 
@@ -870,114 +891,6 @@
     </div>
 
 
-    <!-- Mountain illustration -->
-    <div class="mountain-art" aria-hidden="true">
-
-        <svg viewBox="0 0 1440 420" preserveAspectRatio="none">
-
-            <!-- Distant ridge -->
-            <path
-                class="mountain-back"
-                d="M0 330
-                   L80 265 L135 295 L205 205
-                   L260 270 L325 175 L390 260
-                   L455 220 L520 275
-                   L585 170 L650 245
-                   L715 210 L785 285
-                   L850 190 L915 260
-                   L985 160 L1050 250
-                   L1120 195 L1185 265
-                   L1260 175 L1325 250
-                   L1385 205 L1440 245
-                   L1440 420 L0 420 Z" />
-
-            <!-- Mid ridge -->
-            <path
-                class="mountain-mid"
-                d="M0 345
-                   L75 290 L135 325
-                   L215 245 L275 300
-                   L355 210 L420 295
-                   L485 250 L555 320
-                   L625 215 L690 300
-                   L755 250 L825 325
-                   L905 225 L975 305
-                   L1040 240 L1115 315
-                   L1195 230 L1260 310
-                   L1335 250 L1400 315
-                   L1440 285
-                   L1440 420 L0 420 Z" />
-
-            <!-- Front ridge -->
-            <path
-                class="mountain-front"
-                d="M0 355
-                   L95 315 L155 340
-                   L245 280 L320 345
-                   L400 270 L475 340
-                   L555 300 L635 355
-                   L720 275 L800 345
-                   L890 285 L965 355
-                   L1040 290 L1120 350
-                   L1200 275 L1280 340
-                   L1360 285 L1440 335
-                   L1440 420 L0 420 Z" />
-
-            <!-- Dark foreground -->
-            <path
-                class="mountain-dark"
-                d="M0 375
-                   L70 345 L120 375
-                   L175 330 L230 385
-                   L300 340 L365 390
-                   L430 350 L495 395
-                   L570 345 L635 390
-                   L710 335 L775 390
-                   L850 350 L925 395
-                   L1000 340 L1070 390
-                   L1145 345 L1210 395
-                   L1290 335 L1360 380
-                   L1410 350 L1440 365
-                   L1440 420 L0 420 Z" />
-
-            <!-- contour lines -->
-            <path
-                class="mountain-line-light"
-                d="M25 324 C130 285 170 345 250 295 S390 300 465 270 S600 300 680 260 S820 295 900 250 S1030 300 1110 255 S1280 295 1410 250" />
-
-            <path
-                class="mountain-line"
-                d="M0 350 C110 305 180 365 270 315 S410 325 500 295 S640 330 730 285 S860 330 950 290 S1100 325 1200 285 S1340 325 1440 280" />
-
-            <path
-                class="mountain-line"
-                d="M0 370 C120 330 190 380 285 340 S425 355 515 320 S655 360 750 315 S890 355 980 320 S1130 355 1225 315 S1360 355 1440 320" />
-
-            <path
-                class="mountain-line-light"
-                d="M75 300 L135 260 L165 315
-                   M300 265 L355 220 L390 290
-                   M575 225 L625 180 L660 255
-                   M850 240 L900 200 L935 275
-                   M1040 230 L1090 195 L1120 265
-                   M1210 235 L1260 195 L1295 270" />
-
-            <!-- Pine silhouettes -->
-            <g class="pine">
-                <path d="M25 420 L25 340 L5 370 L18 370 L0 395 L18 392 L2 420 Z"/>
-                <path d="M55 420 L55 315 L28 355 L45 355 L22 385 L45 382 L25 420 Z"/>
-                <path d="M92 420 L92 335 L72 365 L84 365 L65 392 L84 389 L68 420 Z"/>
-
-                <path d="M1340 420 L1340 315 L1317 350 L1333 350 L1308 383 L1333 379 L1313 420 Z"/>
-                <path d="M1380 420 L1380 290 L1353 330 L1370 330 L1345 365 L1370 362 L1348 420 Z"/>
-                <path d="M1420 420 L1420 330 L1402 360 L1413 360 L1398 388 L1413 385 L1403 420 Z"/>
-            </g>
-
-        </svg>
-
-    </div>
-
-
     <!-- =====================================================
          SEARCH
          ===================================================== -->
@@ -992,20 +905,23 @@
         >
 
             <div class="search-field">
-                <i class="bi bi-search"></i>
+                <button class="search-submit" type="submit" aria-label="Search">
+                    <i class="bi bi-search"></i>
+                </button>
                 <input
                     type="search"
                     name="q"
                     value="{{ query|default:'' }}"
-                    placeholder="Search by destination..."
+                    placeholder="Search destinations, treks..."
                     aria-label="Search by destination"
                 >
             </div>
 
-            <div class="search-field">
-                <i class="bi bi-compass"></i>
+            <div class="search-field search-field-select">
+                <i class="bi bi-sliders"></i>
                 <select
                     name="difficulty"
+                    id="difficultySelect"
                     aria-label="Difficulty"
                 >
                     <option value="">All Difficulties</option>
@@ -1021,7 +937,7 @@
                 </select>
             </div>
 
-            <div class="search-field">
+            <div class="search-field search-field-select">
                 <i class="bi bi-calendar3"></i>
                 <select id="dateFilter" aria-label="Date">
                     <option value="any">Any Date</option>
@@ -1030,16 +946,38 @@
                 </select>
             </div>
 
-            <button class="search-button" type="submit">
-                Search
-                <i class="bi bi-arrow-right"></i>
-            </button>
+            <div class="hero-search-pills-divider" aria-hidden="true"></div>
+
+            <div class="hero-search-pills" role="group" aria-label="Quick difficulty filter">
+                <button
+                    type="button"
+                    class="difficulty-pill {% if difficulty == 'easy' %}is-active{% endif %}"
+                    data-difficulty="easy"
+                >
+                    Easy
+                </button>
+                <button
+                    type="button"
+                    class="difficulty-pill {% if difficulty == 'moderate' %}is-active{% endif %}"
+                    data-difficulty="moderate"
+                >
+                    Moderate
+                </button>
+                <button
+                    type="button"
+                    class="difficulty-pill {% if difficulty == 'hard' %}is-active{% endif %}"
+                    data-difficulty="hard"
+                >
+                    Hard
+                </button>
+            </div>
 
         </form>
 
     </div>
 
 </section>
+
 
 
 <!-- =========================================================
@@ -1161,25 +1099,25 @@
                                 >
                                     <defs>
                                         <linearGradient id="fallbackSky{{ trek.pk }}" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stop-color="#dceaf2"/>
-                                            <stop offset="100%" stop-color="#7995aa"/>
+                                            <stop offset="0%" stop-color="#233845"/>
+                                            <stop offset="100%" stop-color="#111827"/>
                                         </linearGradient>
                                     </defs>
 
                                     <rect width="800" height="450" fill="url(#fallbackSky{{ trek.pk }})"/>
 
                                     <path
-                                        fill="#b3c9d8"
+                                        fill="#3b5568"
                                         d="M0 330 L150 170 L250 285 L370 110 L510 290 L620 155 L800 315 V450 H0Z"
                                     />
 
                                     <path
-                                        fill="#66859d"
+                                        fill="#25394a"
                                         d="M0 365 L180 245 L300 335 L440 205 L560 330 L690 220 L800 320 V450 H0Z"
                                     />
 
                                     <path
-                                        fill="#24475f"
+                                        fill="#0e1a24"
                                         d="M0 400 L110 330 L205 390 L320 315 L440 400 L570 325 L680 390 L800 345 V450 H0Z"
                                     />
                                 </svg>
@@ -1190,14 +1128,9 @@
 
                         <div class="image-overlay"></div>
 
-
-                        <div class="date-badge">
-                            <strong>{{ trek.date|date:"d" }}</strong>
-                            <span>{{ trek.date|date:"M" }}</span>
-                        </div>
-
-                        <span class="type-badge">
-                            Trek
+                        <span class="type-badge {{ trek.difficulty }}">
+                            <span class="dot"></span>
+                            {{ trek.get_difficulty_display }}
                         </span>
 
                     </div>
@@ -1214,7 +1147,16 @@
                         <div class="card-meta">
                             <i class="bi bi-geo-alt"></i>
                             <span>{{ trek.destination }}</span>
+                            <span class="meta-sep">&middot;</span>
+                            <i class="bi bi-people"></i>
+                            <span>{{ trek.participants.count }}/{{ trek.max_participants }}</span>
                         </div>
+
+                        {% if trek.description %}
+                            <p class="event-description">
+                                {{ trek.description|truncatewords:14 }}
+                            </p>
+                        {% endif %}
 
 
                         <div class="card-divider"></div>
@@ -1222,16 +1164,18 @@
 
                         <div class="card-bottom">
 
-                            <div>
-                                <span class="difficulty {{ trek.difficulty }}">
-                                    {{ trek.get_difficulty_display }}
+                            <div class="card-bottom-meta">
+                                <span>
+                                    <i class="bi bi-calendar-event"></i>
+                                    {{ trek.date|date:"M d" }}
                                 </span>
+                                {% if trek.duration %}
+                                    <span>
+                                        <i class="bi bi-clock"></i>
+                                        {{ trek.duration }} Days
+                                    </span>
+                                {% endif %}
                             </div>
-
-                            <span class="participants">
-                                <i class="bi bi-people"></i>
-                                {{ trek.participants.count }}/{{ trek.max_participants }}
-                            </span>
 
                             <a
                                 href="{% url 'trek_expedition_detail' trek.pk %}"
@@ -1339,25 +1283,25 @@
                                 >
                                     <defs>
                                         <linearGradient id="eventFallback{{ event.pk }}" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stop-color="#e6eff5"/>
-                                            <stop offset="100%" stop-color="#7894a9"/>
+                                            <stop offset="0%" stop-color="#233845"/>
+                                            <stop offset="100%" stop-color="#111827"/>
                                         </linearGradient>
                                     </defs>
 
                                     <rect width="800" height="450" fill="url(#eventFallback{{ event.pk }})"/>
 
                                     <path
-                                        fill="#c0d1dc"
+                                        fill="#41586b"
                                         d="M0 335 L140 190 L250 300 L395 115 L520 295 L650 155 L800 300 V450 H0Z"
                                     />
 
                                     <path
-                                        fill="#6f8ba1"
+                                        fill="#293f50"
                                         d="M0 370 L170 260 L290 350 L445 220 L570 340 L700 245 L800 330 V450 H0Z"
                                     />
 
                                     <path
-                                        fill="#1d4059"
+                                        fill="#101c26"
                                         d="M0 405 L130 345 L230 395 L350 330 L470 405 L610 340 L720 395 L800 355 V450 H0Z"
                                     />
                                 </svg>
@@ -1368,13 +1312,8 @@
 
                         <div class="image-overlay"></div>
 
-
-                        <div class="date-badge">
-                            <strong>{{ event.date|date:"d" }}</strong>
-                            <span>{{ event.date|date:"M" }}</span>
-                        </div>
-
-                        <span class="type-badge">
+                        <span class="type-badge event">
+                            <span class="dot"></span>
                             Event
                         </span>
 
@@ -1392,6 +1331,11 @@
                         <div class="card-meta">
                             <i class="bi bi-geo-alt"></i>
                             <span>{{ event.destination }}</span>
+                            <span class="meta-sep">&middot;</span>
+                            <span class="event-likes">
+                                <i class="bi bi-heart"></i>
+                                {{ event.total_likes }} likes
+                            </span>
                         </div>
 
                         <p class="event-description">
@@ -1404,10 +1348,18 @@
 
                         <div class="card-bottom">
 
-                            <span class="event-likes">
-                                <i class="bi bi-heart"></i>
-                                {{ event.total_likes }} likes
-                            </span>
+                            <div class="card-bottom-meta">
+                                <span>
+                                    <i class="bi bi-calendar-event"></i>
+                                    {{ event.date|date:"M d" }}
+                                </span>
+                                {% if event.duration %}
+                                    <span>
+                                        <i class="bi bi-clock"></i>
+                                        {{ event.duration }} Days
+                                    </span>
+                                {% endif %}
+                            </div>
 
                             <a
                                 href="{% url 'trek_detail' event.pk %}"
@@ -1461,6 +1413,21 @@
             </div>
 
         </div>
+
+
+        {% if page_obj and page_obj.has_next %}
+            <!-- Only renders once the view passes a paginated page_obj —
+                 see the note in the chat response about wiring this up
+                 on the Django view side. -->
+            <div class="load-more-wrap">
+                <a
+                    href="?page={{ page_obj.next_page_number }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}{% if difficulty %}&amp;difficulty={{ difficulty|urlencode }}{% endif %}"
+                    class="load-more-btn"
+                >
+                    Load More Expeditions
+                </a>
+            </div>
+        {% endif %}
 
 
         <!-- =====================================================
@@ -1654,6 +1621,33 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    const difficultyPills = Array.from(
+        document.querySelectorAll(".difficulty-pill")
+    );
+
+    function syncPillActiveStates() {
+        const current = difficultySelect ? difficultySelect.value : "";
+        difficultyPills.forEach(function (pill) {
+            pill.classList.toggle(
+                "is-active",
+                pill.dataset.difficulty === current
+            );
+        });
+    }
+
+    difficultyPills.forEach(function (pill) {
+        pill.addEventListener("click", function () {
+            if (!difficultySelect) {
+                return;
+            }
+            // Clicking the already-active pill clears back to "All".
+            const alreadyActive = pill.classList.contains("is-active");
+            difficultySelect.value = alreadyActive ? "" : pill.dataset.difficulty;
+            syncPillActiveStates();
+            filterCards();
+        });
+    });
+
     if (searchInput) {
         searchInput.addEventListener(
             "input",
@@ -1664,7 +1658,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (difficultySelect) {
         difficultySelect.addEventListener(
             "change",
-            filterCards
+            function () {
+                syncPillActiveStates();
+                filterCards();
+            }
         );
     }
 

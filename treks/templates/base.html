@@ -1,1468 +1,225 @@
-{% load static %}
-
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>
-        {% block title %}The Alpine Route{% endblock %}
-    </title>
-
-    <meta
-        name="description"
-        content="The Alpine Route — discover breathtaking treks, events and adventures."
-    >
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
-    <!--
-        Bootstrap CSS + Icons.
-
-        BUG FIX: this was missing entirely. Every other template in the
-        project (forms, auth pages, profile, trek/event detail carousels)
-        is built with Bootstrap 5 classes and bi-* icons, so without this
-        those pages were rendering completely unstyled and the detail-page
-        image carousels had no JS to drive them.
-    -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-        rel="stylesheet"
-    >
-
-    <!-- Optional page-specific CSS -->
-    {% block extra_css %}{% endblock %}
-
-    <style>
-        /* =========================================================
-           THE ALPINE ROUTE
-           Global Design System
-        ========================================================= */
-
-        :root {
-            --navy: #102b45;
-            --navy-dark: #091d2e;
-            --navy-deep: #071827;
-
-            --blue: #315f8a;
-            --blue-light: #6f8faa;
-
-            --steel: #879daf;
-            --mist: #e9eff3;
-            --snow: #f8fafb;
-            --white: #ffffff;
-
-            --text: #172b3d;
-            --muted: #718293;
-
-            --border: #d8e1e8;
-
-            --shadow-sm:
-                0 2px 8px rgba(16, 43, 69, 0.06);
-
-            --shadow-md:
-                0 10px 30px rgba(16, 43, 69, 0.10);
-
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 18px;
-
-            --container: 1200px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: "DM Sans", sans-serif;
-            background: var(--snow);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        button,
-        input,
-        select {
-            font: inherit;
-        }
-
-        img {
-            max-width: 100%;
-            display: block;
-        }
-
-        /* =========================================================
-           CONTAINER
-        ========================================================= */
-
-        .alpine-container {
-            width: min(1200px, calc(100% - 40px));
-            margin: 0 auto;
-        }
-
-        /* =========================================================
-           HEADER
-        ========================================================= */
-
-        .alpine-header {
-            position: relative;
-            z-index: 1000;
-
-            width: 100%;
-
-            background: rgba(255, 255, 255, 0.96);
-            border-bottom: 1px solid rgba(216, 225, 232, 0.8);
-
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-
-            transition:
-                box-shadow 0.25s ease,
-                background 0.25s ease;
-        }
-
-        .alpine-header.scrolled {
-            box-shadow: 0 5px 25px rgba(16, 43, 69, 0.08);
-        }
-
-        .alpine-navbar {
-            min-height: 82px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 30px;
-        }
-
-        /* =========================================================
-           LOGO
-        ========================================================= */
-
-        .alpine-brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-
-            flex-shrink: 0;
-        }
-
-        .alpine-logo-mark {
-            width: 70px;
-            height: 52px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .alpine-logo-mark svg {
-            width: 70px;
-            height: 52px;
-
-            fill: none;
-            stroke: var(--navy);
-
-            stroke-width: 1.7;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .alpine-brand-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .alpine-brand-name {
-            font-family: "Playfair Display", serif;
-
-            color: var(--navy);
-
-            font-size: 23px;
-            line-height: 1.05;
-
-            letter-spacing: 0.04em;
-            font-weight: 700;
-        }
-
-        .alpine-brand-tagline {
-            margin-top: 5px;
-
-            color: var(--navy);
-
-            font-size: 10px;
-            font-weight: 600;
-
-            letter-spacing: 0.13em;
-            text-transform: uppercase;
-
-            white-space: nowrap;
-        }
-
-        /* =========================================================
-           NAVIGATION
-        ========================================================= */
-
-        .alpine-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            gap: 36px;
-
-            margin-left: auto;
-        }
-
-        .alpine-nav-link {
-            position: relative;
-
-            padding: 29px 0 25px;
-
-            color: #182c3e;
-
-            font-size: 14px;
-            font-weight: 600;
-
-            transition:
-                color 0.2s ease;
-        }
-
-        .alpine-nav-link::after {
-            content: "";
-
-            position: absolute;
-
-            left: 0;
-            right: 0;
-            bottom: 18px;
-
-            height: 2px;
-
-            background: var(--blue);
-
-            transform: scaleX(0);
-            transform-origin: center;
-
-            transition: transform 0.2s ease;
-        }
-
-        .alpine-nav-link:hover {
-            color: var(--blue);
-        }
-
-        .alpine-nav-link:hover::after {
-            transform: scaleX(1);
-        }
-
-        /* =========================================================
-           HEADER ACTIONS
-        ========================================================= */
-
-        .alpine-actions {
-            display: flex;
-            align-items: center;
-
-            gap: 12px;
-
-            flex-shrink: 0;
-        }
-
-        .alpine-social-link {
-            width: 38px;
-            height: 38px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            color: var(--navy);
-
-            border-radius: 8px;
-
-            transition:
-                background 0.2s ease,
-                color 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        .alpine-social-link:hover {
-            background: var(--mist);
-            color: var(--blue);
-
-            transform: translateY(-2px);
-        }
-
-        .alpine-social-link svg {
-            width: 23px;
-            height: 23px;
-        }
-
-        .alpine-action-divider {
-            width: 1px;
-            height: 28px;
-
-            margin: 0 10px;
-
-            background: var(--border);
-        }
-
-        /* =========================================================
-           BUTTONS
-        ========================================================= */
-
-        .alpine-btn {
-            min-height: 42px;
-
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-
-            padding: 0 23px;
-
-            border-radius: 8px;
-
-            font-size: 14px;
-            font-weight: 600;
-
-            cursor: pointer;
-
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease,
-                background 0.2s ease;
-        }
-
-        .alpine-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .alpine-btn-outline {
-            color: var(--navy);
-
-            background: transparent;
-
-            border: 1px solid #b9c7d3;
-        }
-
-        .alpine-btn-outline:hover {
-            background: var(--mist);
-
-            box-shadow: var(--shadow-sm);
-        }
-
-        .alpine-btn-primary {
-            color: white;
-
-            background: var(--navy);
-
-            border: 1px solid var(--navy);
-
-            box-shadow:
-                0 4px 12px rgba(16, 43, 69, 0.16);
-        }
-
-        .alpine-btn-primary:hover {
-            background: #173a5b;
-
-            box-shadow:
-                0 8px 20px rgba(16, 43, 69, 0.22);
-        }
-
-        /* =========================================================
-           MOBILE MENU BUTTON
-        ========================================================= */
-
-        .alpine-mobile-toggle {
-            display: none;
-
-            width: 42px;
-            height: 42px;
-
-            align-items: center;
-            justify-content: center;
-
-            background: transparent;
-
-            border: 1px solid var(--border);
-            border-radius: 8px;
-
-            color: var(--navy);
-
-            cursor: pointer;
-        }
-
-        .alpine-mobile-toggle svg {
-            width: 22px;
-            height: 22px;
-        }
-
-        /* =========================================================
-           MAIN
-        ========================================================= */
-
-        main {
-            min-height: 50vh;
-        }
-
-        /* =========================================================
-           FOOTER
-        ========================================================= */
-
-        .alpine-footer {
-            position: relative;
-
-            overflow: hidden;
-
-            margin-top: 70px;
-
-            color: rgba(255, 255, 255, 0.88);
-
-            background:
-                linear-gradient(
-                    180deg,
-                    #0a2439 0%,
-                    #071b2c 100%
-                );
-        }
-
-        /*
-            Subtle topographic pattern.
-            This gives the footer the mountain/map feeling without
-            requiring the old Karakoram image or JavaScript.
-        */
-
-        .alpine-footer::before {
-            content: "";
-
-            position: absolute;
-
-            inset: 0;
-
-            opacity: 0.08;
-
-            background-image:
-                repeating-radial-gradient(
-                    ellipse at 20% 20%,
-                    transparent 0,
-                    transparent 24px,
-                    rgba(255,255,255,0.4) 25px,
-                    transparent 26px,
-                    transparent 48px
-                );
-
-            pointer-events: none;
-        }
-
-        .alpine-footer-inner {
-            position: relative;
-            z-index: 1;
-
-            width: min(1200px, calc(100% - 40px));
-
-            margin: 0 auto;
-
-            padding: 54px 0 24px;
-        }
-
-        .alpine-footer-grid {
-            display: grid;
-
-            grid-template-columns:
-                1.7fr
-                0.9fr
-                0.9fr
-                1fr;
-
-            gap: 55px;
-        }
-
-        /* =========================================================
-           FOOTER BRAND
-        ========================================================= */
-
-        .alpine-footer-brand {
-            max-width: 320px;
-        }
-
-        .alpine-footer-brand-row {
-            display: flex;
-            align-items: center;
-
-            gap: 12px;
-
-            margin-bottom: 18px;
-        }
-
-        .alpine-footer-logo {
-            width: 55px;
-            height: 42px;
-        }
-
-        .alpine-footer-logo svg {
-            width: 55px;
-            height: 42px;
-
-            fill: none;
-
-            stroke: white;
-
-            stroke-width: 1.5;
-
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .alpine-footer-brand-name {
-            font-family: "Playfair Display", serif;
-
-            color: white;
-
-            font-size: 20px;
-
-            letter-spacing: 0.04em;
-        }
-
-        .alpine-footer-tagline {
-            margin-top: 2px;
-
-            font-size: 9px;
-
-            font-weight: 600;
-
-            letter-spacing: 0.1em;
-
-            text-transform: uppercase;
-
-            color: rgba(255,255,255,0.72);
-        }
-
-        .alpine-footer-description {
-            max-width: 320px;
-
-            color: rgba(255,255,255,0.68);
-
-            font-size: 13px;
-
-            line-height: 1.8;
-        }
-
-        /* =========================================================
-           FOOTER SOCIAL
-        ========================================================= */
-
-        .alpine-footer-socials {
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            margin-top: 20px;
-        }
-
-        .alpine-footer-social {
-            width: 35px;
-            height: 35px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            color: white;
-
-            background: rgba(255,255,255,0.05);
-
-            border: 1px solid rgba(255,255,255,0.22);
-
-            border-radius: 7px;
-
-            transition:
-                background 0.2s ease,
-                border-color 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        .alpine-footer-social:hover {
-            background: rgba(255,255,255,0.14);
-
-            border-color: rgba(255,255,255,0.5);
-
-            transform: translateY(-2px);
-        }
-
-        .alpine-footer-social svg {
-            width: 19px;
-            height: 19px;
-        }
-
-        /* =========================================================
-           FOOTER COLUMNS
-        ========================================================= */
-
-        .alpine-footer-column h3 {
-            margin-bottom: 18px;
-
-            color: white;
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-            letter-spacing: 0.12em;
-
-            text-transform: uppercase;
-        }
-
-        .alpine-footer-column ul {
-            list-style: none;
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 10px;
-        }
-
-        .alpine-footer-column a {
-            color: rgba(255,255,255,0.68);
-
-            font-size: 13px;
-
-            transition:
-                color 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        .alpine-footer-column a:hover {
-            color: white;
-
-            transform: translateX(3px);
-        }
-
-        /* Footer logout button — matches the footer link list styling */
-        .alpine-footer-logout-form {
-            margin: 0;
-        }
-
-        .alpine-footer-logout-form button {
-            background: none;
-            border: none;
-            padding: 0;
-
-            color: rgba(255,255,255,0.68);
-
-            font-size: 13px;
-            cursor: pointer;
-
-            transition:
-                color 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        .alpine-footer-logout-form button:hover {
-            color: white;
-
-            transform: translateX(3px);
-        }
-
-        /* =========================================================
-           FOOTER BOTTOM
-        ========================================================= */
-
-        .alpine-footer-bottom {
-            position: relative;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            gap: 12px;
-
-            margin-top: 45px;
-
-            padding-top: 22px;
-
-            border-top:
-                1px solid rgba(255,255,255,0.13);
-
-            color: rgba(255,255,255,0.55);
-
-            font-size: 12px;
-
-            text-align: center;
-        }
-
-        .alpine-footer-bottom strong {
-            color: rgba(255,255,255,0.82);
-
-            font-weight: 600;
-        }
-
-        /* =========================================================
-           RESPONSIVE
-        ========================================================= */
-
-        @media (max-width: 1100px) {
-
-            .alpine-nav {
-                gap: 20px;
-            }
-
-            .alpine-brand-tagline {
-                display: none;
-            }
-
-            .alpine-brand-name {
-                font-size: 20px;
-            }
-
-            .alpine-footer-grid {
-                grid-template-columns:
-                    1.5fr
-                    1fr
-                    1fr;
-            }
-
-            .alpine-footer-brand {
-                grid-column: span 3;
-                max-width: 500px;
-            }
-        }
-
-        @media (max-width: 900px) {
-
-            .alpine-navbar {
-                min-height: 72px;
-            }
-
-            .alpine-mobile-toggle {
-                display: flex;
-            }
-
-            .alpine-nav,
-            .alpine-actions {
-                display: none;
-            }
-
-            .alpine-mobile-open .alpine-nav {
-                display: flex;
-
-                position: absolute;
-
-                top: 72px;
-                left: 0;
-                right: 0;
-
-                padding: 18px 25px 25px;
-
-                flex-direction: column;
-
-                align-items: stretch;
-
-                gap: 0;
-
-                background: white;
-
-                border-bottom: 1px solid var(--border);
-
-                box-shadow: var(--shadow-md);
-            }
-
-            .alpine-mobile-open .alpine-nav-link {
-                padding: 14px 0;
-
-                border-bottom: 1px solid var(--border);
-            }
-
-            .alpine-mobile-open .alpine-nav-link::after {
-                display: none;
-            }
-
-            .alpine-mobile-open .alpine-actions {
-                display: flex;
-
-                position: absolute;
-
-                top: 72px;
-
-                left: 0;
-                right: 0;
-
-                margin-top: 260px;
-
-                padding: 15px 25px 20px;
-
-                background: white;
-            }
-
-            .alpine-footer-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 40px;
-            }
-
-            .alpine-footer-brand {
-                grid-column: span 2;
-            }
-        }
-
-        @media (max-width: 600px) {
-
-            .alpine-container {
-                width: min(100% - 28px, 1200px);
-            }
-
-            .alpine-navbar {
-                gap: 10px;
-            }
-
-            .alpine-logo-mark {
-                width: 52px;
-            }
-
-            .alpine-logo-mark svg {
-                width: 52px;
-            }
-
-            .alpine-brand-name {
-                font-size: 18px;
-            }
-
-            .alpine-footer-inner {
-                width: min(100% - 28px, 1200px);
-
-                padding-top: 40px;
-            }
-
-            .alpine-footer-grid {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-
-            .alpine-footer-brand {
-                grid-column: span 1;
-            }
-
-            .alpine-footer-bottom {
-                flex-direction: column;
-
-                gap: 5px;
-
-                line-height: 1.6;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<!-- =============================================================
-     HEADER
-============================================================= -->
-
-<header class="alpine-header" id="alpineHeader">
-
-    <div class="alpine-container">
-
-        <nav class="alpine-navbar">
-
-            <!-- BRAND -->
-            <a href="/" class="alpine-brand">
-
-                <div class="alpine-logo-mark">
-
-                    <!-- Mountain SVG -->
-                    <svg viewBox="0 0 100 70" aria-hidden="true">
-
-                        <path d="M5 62 L30 29 L42 45 L57 18 L95 62"/>
-
-                        <path d="M17 62 L39 38 L51 52"/>
-
-                        <path d="M57 18 L68 35 L75 29 L95 62"/>
-
-                        <path d="M43 38 L57 18 L68 35"/>
-
-                        <path d="M51 52 L57 43 L64 50"/>
-
-                    </svg>
-
-                </div>
-
-                <div class="alpine-brand-text">
-
-                    <span class="alpine-brand-name">
-                        THE ALPINE ROUTE
-                    </span>
-
-                    <span class="alpine-brand-tagline">
-                        Trek together. Remember longer.
-                    </span>
-
-                </div>
-
-            </a>
-
-
-            <!-- MAIN NAV -->
-            <div class="alpine-nav" id="alpineNav">
-
-                <a href="{% url 'trek_list' %}" class="alpine-nav-link">
-                    Treks &amp; Events
-                </a>
-
-                <a href="{% url 'upcoming_treks' %}" class="alpine-nav-link">
-                    Upcoming
-                </a>
-
-                <!-- BUG FIX: this pointed to /past-events/, which doesn't
-                     exist — the actual URL name is 'previous_treks'. -->
-                <a href="{% url 'previous_treks' %}" class="alpine-nav-link">
-                    Past Events
-                </a>
-
-              
-
-                {% if user.is_staff %}
-                    <!-- BUG FIX: there was previously no link anywhere on
-                         the site to reach these two staff-only pages. -->
-                    <a href="{% url 'create_trek' %}" class="alpine-nav-link">
-                        + New Trek
-                    </a>
-
-                    <a href="{% url 'create_trek_event' %}" class="alpine-nav-link">
-                        + New Event
-                    </a>
-                {% endif %}
-
-            </div>
-
-
-            <!-- ACTIONS -->
-            <div class="alpine-actions">
-
-               
-
-
-                <span class="alpine-action-divider"></span>
-
-                <!--
-                    BUG FIX: this block previously showed Login/Register
-                    unconditionally, even to already-logged-in users, and
-                    there was no Logout link anywhere on the site.
-                -->
-                {% if user.is_authenticated %}
-
-                    <!-- PROFILE -->
-                    <a
-                        href="{% url 'profile' %}"
-                        class="alpine-btn alpine-btn-outline"
-                    >
-                        {{ user.username }}
-                    </a>
-
-                    <!-- LOGOUT (Django's LogoutView only accepts POST) -->
-                    <form action="{% url 'logout' %}" method="post" class="alpine-logout-form">
-                        {% csrf_token %}
-                        <button type="submit" class="alpine-btn alpine-btn-primary">
-                            Log Out
-                        </button>
-                    </form>
-
-                {% else %}
-
-                    <!-- LOGIN -->
-                    <a
-                        href="{% url 'login' %}"
-                        class="alpine-btn alpine-btn-outline"
-                    >
-                        Login
-                    </a>
-
-
-                    <!-- REGISTER -->
-                    <a
-                        href="{% url 'register' %}"
-                        class="alpine-btn alpine-btn-primary"
-                    >
-                        Register
-                    </a>
-
-                {% endif %}
-
-            </div>
-
-
-            <!-- MOBILE BUTTON -->
-            <button
-                class="alpine-mobile-toggle"
-                id="alpineMobileToggle"
-                type="button"
-                aria-label="Open navigation"
-                aria-expanded="false"
-            >
-
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                >
-                    <line x1="4" y1="6" x2="20" y2="6"></line>
-                    <line x1="4" y1="12" x2="20" y2="12"></line>
-                    <line x1="4" y1="18" x2="20" y2="18"></line>
-                </svg>
-
-            </button>
-
-        </nav>
-
-    </div>
-
-</header>
-
-
-<!-- =============================================================
-     MAIN CONTENT
-============================================================= -->
-
-<main>
-
-    {% block content %}
-    {% endblock %}
-
-</main>
-
-
-<!-- =============================================================
-     FOOTER
-============================================================= -->
-
-<footer class="alpine-footer">
-
-    <div class="alpine-footer-inner">
-
-        <div class="alpine-footer-grid">
-
-
-            <!-- =================================================
-                 FOOTER BRAND
-            ================================================== -->
-
-            <div class="alpine-footer-brand">
-
-                <div class="alpine-footer-brand-row">
-
-                    <div class="alpine-footer-logo">
-
-                        <svg viewBox="0 0 100 70">
-
-                            <path d="M5 62 L30 29 L42 45 L57 18 L95 62"/>
-
-                            <path d="M17 62 L39 38 L51 52"/>
-
-                            <path d="M57 18 L68 35 L75 29 L95 62"/>
-
-                            <path d="M43 38 L57 18 L68 35"/>
-
-                            <path d="M51 52 L57 43 L64 50"/>
-
-                        </svg>
-
-                    </div>
-
-
-                    <div>
-
-                        <div class="alpine-footer-brand-name">
-                            THE ALPINE ROUTE
-                        </div>
-
-                        <div class="alpine-footer-tagline">
-                            Trek together. Remember longer.
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <p class="alpine-footer-description">
-
-                    We bring together adventure seekers and nature
-                    lovers to explore breathtaking trails, discover
-                    inspiring events and create unforgettable memories.
-
-                </p>
-
-
-                <!-- FOOTER SOCIAL ICONS -->
-                <div class="alpine-footer-socials">
-
-
-                    <!-- GitHub -->
-                    <a
-                        href="https://github.com/MOHAMMAD-TAHA-MALIK"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="alpine-footer-social"
-                        aria-label="GitHub"
-                        title="GitHub"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                        >
-                            <path d="
-                                M12 2
-                                C6.48 2 2 6.58 2 12.2
-                                C2 16.72 4.87 20.55 8.84 21.9
-                                C9.34 22 9.52 21.68 9.52 21.4
-                                C9.52 21.15 9.51 20.32 9.51 19.2
-                                C6.73 19.82 6.14 17.82 6.14 17.82
-                                C5.69 16.63 5.03 16.31 5.03 16.31
-                                C4.12 15.68 5.1 15.7 5.1 15.7
-                                C6.11 15.77 6.64 16.77 6.64 16.77
-                                C7.53 18.33 8.98 17.87 9.54 17.6
-                                C9.63 16.94 9.89 16.49 10.17 16.24
-                                C7.95 15.98 5.62 15.09 5.62 11.07
-                                C5.62 9.92 6.02 8.98 6.67 8.24
-                                C6.57 7.99 6.21 6.91 6.76 5.48
-                                C6.76 5.48 7.63 5.2 9.51 6.5
-                                C10.34 6.26 11.2 6.14 12 6.14
-                                C12.8 6.14 13.66 6.26 14.49 6.5
-                                C16.37 5.2 17.24 5.48 17.24 5.48
-                                C17.79 6.91 17.43 7.99 17.33 8.24
-                                C17.98 8.98 18.38 9.92 18.38 11.07
-                                C18.38 15.1 16.05 15.97 13.82 16.24
-                                C14.18 16.57 14.5 17.21 14.5 18.18
-                                C14.5 19.56 14.49 20.68 14.49 21.4
-                                C14.49 21.68 14.67 22 15.17 21.9
-                                C19.13 20.55 22 16.72 22 12.2
-                                C22 6.58 17.52 2 12 2
-                                Z
-                            "/>
-                        </svg>
-
-                    </a>
-
-
-                    <!-- LinkedIn -->
-                    <a
-                        href="https://www.linkedin.com/in/tahamalik1/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="alpine-footer-social"
-                        aria-label="LinkedIn"
-                        title="LinkedIn"
-                    >
-
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                        >
-                            <path d="
-                                M20.45 20.45H16.9V14.9
-                                C16.9 13.58 16.88 11.88 15.06 11.88
-                                C13.22 11.88 12.94 13.32 12.94 14.79
-                                V20.45H9.39V8.99H12.8V10.56H12.85
-                                C13.32 9.66 14.49 8.71 16.22 8.71
-                                C19.81 8.71 20.45 11.08 20.45 14.16
-                                V20.45ZM5.38 7.42
-                                C4.24 7.42 3.32 6.5 3.32 5.36
-                                C3.32 4.22 4.24 3.3 5.38 3.3
-                                C6.52 3.3 7.44 4.22 7.44 5.36
-                                C7.44 6.5 6.52 7.42 5.38 7.42ZM3.61 20.45H7.16V8.99H3.61V20.45ZM22.22 0H1.77
-                                C0.79 0 0 0.79 0 1.77V22.23
-                                C0 23.21 0.79 24 1.77 24H22.22
-                                C23.2 24 24 23.21 24 22.23V1.77
-                                C24 0.79 23.2 0 22.22 0Z
-                            "/>
-                        </svg>
-
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 QUICK LINKS
-            ================================================== -->
-
-            <div class="alpine-footer-column">
-
-                <h3>Quick Links</h3>
-
-                <ul>
-
-                    <li>
-                        <a href="{% url 'trek_list' %}">
-                            All Treks &amp; Events
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{% url 'upcoming_treks' %}">
-                            Upcoming Treks
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="{% url 'previous_treks' %}">
-                            Past Events
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/about/">
-                            About Us
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/contact/">
-                            Contact Us
-                        </a>
-                    </li>
-
-                </ul>
-
-            </div>
-
-
-            <!-- =================================================
-                 ACCOUNT
-            ================================================== -->
-
-            <div class="alpine-footer-column">
-
-                <h3>Account</h3>
-
-                <ul>
-
-                    {% if user.is_authenticated %}
-
-                        <li>
-                            <a href="{% url 'profile' %}">
-                                My Profile
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{% url 'change_password' %}">
-                                Change Password
-                            </a>
-                        </li>
-
-                        <li>
-                            <form action="{% url 'logout' %}" method="post" class="alpine-footer-logout-form">
-                                {% csrf_token %}
-                                <button type="submit">Log Out</button>
-                            </form>
-                        </li>
-
-                    {% else %}
-
-                        <li>
-                            <a href="{% url 'login' %}">
-                                Login
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{% url 'register' %}">
-                                Register
-                            </a>
-                        </li>
-
-                    {% endif %}
-
-                </ul>
-
-            </div>
-
-
-            <!-- =================================================
-                 SUPPORT
-            ================================================== -->
-
-            <div class="alpine-footer-column">
-
-                <h3>Support</h3>
-
-                <ul>
-
-                    <li>
-                        <a href="/help/">
-                            Help Center
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/community-guidelines/">
-                            Community Guidelines
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/terms/">
-                            Terms &amp; Conditions
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/privacy/">
-                            Privacy Policy
-                        </a>
-                    </li>
-
-                </ul>
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             COPYRIGHT
-        ====================================================== -->
-
-        <div class="alpine-footer-bottom">
-
-            <span>
-                © 2026 The Alpine Route.
-            </span>
-
-            <strong>
-                All rights reserved.
-            </strong>
-
-            <span>
-                Designed &amp; built by Taha Malik.
-            </span>
-
-        </div>
-
-    </div>
-
-</footer>
-
-
-<!-- =============================================================
-     GLOBAL JAVASCRIPT
-============================================================= -->
-
-<!-- Bootstrap bundle (includes Popper) — drives the carousels, and any
-     other Bootstrap JS components used by child templates. -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{% block title %}The Alpine Route{% endblock %}</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
 
 <script>
-
-    /*
-     * Header shadow on scroll
-     */
-
-    const alpineHeader =
-        document.getElementById("alpineHeader");
-
-    window.addEventListener("scroll", function () {
-
-        if (window.scrollY > 10) {
-
-            alpineHeader.classList.add("scrolled");
-
-        } else {
-
-            alpineHeader.classList.remove("scrolled");
-
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            alpine: {
+              dark: '#1a2634',
+              darker: '#111827',
+              teal: '#233845',
+              card: '#2a3b4a',
+              accent: '#93c5fd',
+              text: '#e2e8f0',
+              muted: '#94a3b8'
+            }
+          },
         }
-
-    });
-
-
-    /*
-     * Mobile navigation
-     */
-
-    const alpineMobileToggle =
-        document.getElementById("alpineMobileToggle");
-
-    const alpineNavbar =
-        document.querySelector(".alpine-navbar");
-
-
-    alpineMobileToggle.addEventListener("click", function () {
-
-        const isOpen =
-            alpineNavbar.classList.toggle("alpine-mobile-open");
-
-        alpineMobileToggle.setAttribute(
-            "aria-expanded",
-            isOpen
-        );
-
-    });
-
-
-    /*
-     * Close mobile menu after clicking a navigation link
-     */
-
-    document
-        .querySelectorAll(".alpine-nav-link")
-        .forEach(function (link) {
-
-            link.addEventListener("click", function () {
-
-                alpineNavbar.classList.remove(
-                    "alpine-mobile-open"
-                );
-
-                alpineMobileToggle.setAttribute(
-                    "aria-expanded",
-                    "false"
-                );
-
-            });
-
-        });
-
+      }
+    }
 </script>
+<style data-purpose="custom-styles">
+    body {
+      background-color: #111827;
+      color: #e2e8f0;
+    }
 
+    /* Screen-reader-only text (carousel prev/next labels, etc). */
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
 
-{% block extra_js %}
-{% endblock %}
-
-</body>
-</html>
+    /* ---------------------------------------------------------------
+       Bootstrap-carousel-equivalent structural CSS.
+       We load Bootstrap's JS bundle (below, for the slide/indicator
+       behaviour) but NOT its CSS, so it can't fight with Tailwind's
+       utility classes anywhere else on the site. This is just the
+       slice of Bootstrap 5's carousel.css needed for .carousel to
+       actually animate; page-specific look (colors/sizing) is layered
+       on top in each template's own extra_css block.
+       --------------------------------------------------------------- */
+    .carousel { position: relative; }
+    .carousel-inner {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+    .carousel-item {
+      position: relative;
+      display: none;
+      float: left;
+      width: 100%;
+      margin-right: -100%;
+      backface-visibility: hidden;
+      transition: transform .6s ease-in-out;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .carousel-item { transition: none; }
+    }
+    .carousel-item.active,
+    .carousel-item-next,
+    .carousel-item-prev {
+      display: block;
+    }
+    .carousel-item-next:not(.carousel-item-start),
+    .active.carousel-item-end {
+      transform: translateX(100%);
+    }
+    .carousel-item-prev:not(.carousel-item-end),
+    .active.carousel-item-start {
+      transform: translateX(-100%);
+    }
+    .carousel-control-prev,
+    .carousel-control-next {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      text-align: center;
+      background: none;
+      border: 0;
+    }
+    .carousel-control-prev { left: 0; }
+    .carousel-control-next { right: 0; }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      display: inline-block;
+      background-repeat: no-repeat;
+      background-position: 50%;
+      background-size: 100% 100%;
+    }
+    .carousel-control-prev-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+    }
+    .carousel-control-next-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+    .carousel-indicators {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      padding: 0;
+      margin-right: 15%;
+      margin-bottom: 1rem;
+      margin-left: 15%;
+      list-style: none;
+    }
+    .carousel-indicators [data-bs-target] {
+      box-sizing: content-box;
+      flex: 0 1 auto;
+      padding: 0;
+      cursor: pointer;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 0;
+      opacity: .5;
+      transition: opacity .6s ease;
+    }
+  </style>
+{% block extra_css %}{% endblock %}
+</head>
+<body class="font-sans antialiased text-alpine-text bg-alpine-darker">
+<!-- BEGIN: Navigation -->
+<header class="absolute top-0 inset-x-0 z-30 w-full" data-purpose="main-navigation">
+<div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+<a class="font-serif text-xl tracking-wide uppercase text-white font-semibold" href="{% url 'trek_list' %}">
+        The Alpine Route
+      </a>
+<nav class="hidden md:flex space-x-8 text-sm font-medium text-white/90 uppercase tracking-wider">
+<a class="border-b-2 border-white pb-1" href="{% url 'trek_list' %}">Expeditions</a>
+<a class="hover:text-white transition-colors pb-1" href="#">Destinations</a>
+<a class="hover:text-white transition-colors pb-1" href="#">The Journal</a>
+<a class="hover:text-white transition-colors pb-1" href="#">About</a>
+</nav>
+<div class="flex items-center space-x-6">
+<a aria-label="Search treks and events" class="text-white hover:text-gray-300 transition-colors" href="{% url 'trek_list' %}#adventures">
+<i class="fa-solid fa-magnifying-glass text-lg"></i>
+</a>
+<a class="bg-blue-200 text-alpine-darker px-6 py-2 rounded-sm text-sm font-bold uppercase tracking-wide hover:bg-blue-300 transition-colors" href="#">
+          Book Now
+        </a>
+</div>
+</div>
+</header>
+<!-- END: Navigation -->
+<main>
+{% block content %}{% endblock %}
+</main>
+<!-- BEGIN: Footer -->
+<footer class="bg-alpine-darker pt-20 pb-10 border-t border-white/5" data-purpose="site-footer">
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+<!-- Brand -->
+<div class="col-span-1 md:col-span-1">
+<h2 class="font-serif text-2xl uppercase text-white font-semibold mb-4 leading-snug">
+          The Alpine<br/>Route
+        </h2>
+<p class="text-alpine-muted text-sm">
+          Trek together. Remember longer.
+        </p>
+</div>
+<!-- Links Column 1 -->
+<div>
+<h4 class="text-[10px] font-bold uppercase tracking-widest text-alpine-muted mb-6">Explore</h4>
+<ul class="space-y-4 text-sm font-medium">
+<li><a class="text-white hover:text-blue-300 transition-colors" href="{% url 'trek_list' %}">Expeditions</a></li>
+<li><a class="text-white hover:text-blue-300 transition-colors" href="#">Safety Protocols</a></li>
+</ul>
+</div>
+<!-- Links Column 2 -->
+<div>
+<h4 class="text-[10px] font-bold uppercase tracking-widest text-alpine-muted mb-6">Connect</h4>
+<ul class="space-y-4 text-sm font-medium">
+<li><a class="text-white hover:text-blue-300 transition-colors" href="#">Sustainability</a></li>
+<li><a class="text-white hover:text-blue-300 transition-colors" href="#">Journal</a></li>
+</ul>
+</div>
+<!-- Links Column 3 -->
+<div>
+<h4 class="text-[10px] font-bold uppercase tracking-widest text-alpine-muted mb-6">Legal</h4>
+<ul class="space-y-4 text-sm font-medium">
+<li><a class="text-white hover:text-blue-300 transition-colors" href="#">Contact</a></li>
+<li><a class="text-white hover:text-blue-300 transition-colors" href="#">Terms</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-6 border-t border-white/10 pt-6 text-xs text-alpine-muted/50 text-center md:text-left">
+      © {% now "Y" %} The Alpine Route. All rights reserved. built by Taha Malik.
+    </div>
+</footer>
+<!-- END: Footer -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body></html>
