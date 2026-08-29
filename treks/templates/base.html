@@ -817,7 +817,16 @@
                 left: 0;
                 right: 0;
 
-                margin-top: 260px;
+                /*
+                    BUG FIX: this used to be a hardcoded "margin-top: 260px"
+                    sized for a 4-link nav. Staff users see 2 extra links
+                    (+New Trek, +New Event), which pushed the real nav
+                    height past 260px and made this panel overlap the last
+                    nav link(s). The JS below now measures the actual
+                    rendered height of #alpineNav and sets this inline,
+                    so it stays correct for any number of links.
+                */
+                margin-top: 0;
 
                 padding: 15px 25px 20px;
 
@@ -968,8 +977,8 @@
 
 
             <!-- ACTIONS -->
-            <div class="alpine-actions">
-               
+            <div class="alpine-actions" id="alpineActions">
+
                 <span class="alpine-action-divider"></span>
 
                 <!--
@@ -1053,7 +1062,16 @@
      MAIN CONTENT
 ============================================================= -->
 
-<main>
+<!--
+    BUG FIX: <main> had no Bootstrap container class. Every page that
+    builds its layout from a bare ".row"/".col" (forms, profile,
+    trek/event detail) depends on a ".container" ancestor to supply
+    the gutters that offset the row's negative margins — without it,
+    rows can bleed past the viewport edge. trek_list.html's own CSS
+    already targets and overrides "main.container" to go full-bleed
+    for its hero, so the class was clearly meant to be here.
+-->
+<main class="container">
 
     {% block content %}
     {% endblock %}
@@ -1420,6 +1438,32 @@
     const alpineNavbar =
         document.querySelector(".alpine-navbar");
 
+    const alpineNav =
+        document.getElementById("alpineNav");
+
+    const alpineActions =
+        document.getElementById("alpineActions");
+
+
+    /*
+     * BUG FIX: the actions panel (login/register or profile/logout)
+     * used to be pushed below the nav-links panel with a hardcoded
+     * CSS margin-top, sized for a 4-link nav. Staff users see 2 extra
+     * links, so the panel overlapped them. Measuring the nav's actual
+     * rendered height keeps this correct no matter how many links
+     * are shown.
+     */
+    function positionMobileActions() {
+
+        if (alpineNav && alpineActions) {
+
+            alpineActions.style.marginTop =
+                alpineNav.offsetHeight + "px";
+
+        }
+
+    }
+
 
     alpineMobileToggle.addEventListener("click", function () {
 
@@ -1430,6 +1474,19 @@
             "aria-expanded",
             isOpen
         );
+
+        if (isOpen) {
+            positionMobileActions();
+        }
+
+    });
+
+
+    window.addEventListener("resize", function () {
+
+        if (alpineNavbar.classList.contains("alpine-mobile-open")) {
+            positionMobileActions();
+        }
 
     });
 

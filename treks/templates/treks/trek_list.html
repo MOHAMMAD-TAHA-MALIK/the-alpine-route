@@ -849,14 +849,27 @@
     <div class="hero-content">
 
         <div class="hero-eyebrow">
-           Pack lighter, hike higher, go further, stay crazy."
+            Your Next Adventure Starts Here
         </div>
 
-      
+        <!-- BUG FIX: the <h1> was missing entirely, even though
+             .hero-title (and its span) is fully styled above — the
+             hero rendered with a blank gap and the page had no <h1>
+             at all. -->
+        <h1 class="hero-title">
+            Discover Your Next
+            <span>Alpine Adventure</span>
+        </h1>
 
+        <!-- BUG FIX: this paragraph was empty, and the phrase below
+             used to sit in the eyebrow above with a stray, unmatched
+             closing quote (" with no opening quote) — moved here
+             where there's room for a full sentence, and using the
+             <strong> style that was already defined but unused. -->
         <p class="hero-description">
-           
-           
+            Pack lighter, hike higher, go further, stay crazy —
+            join a community of <strong>hikers and climbers</strong>
+            discovering the world's most breathtaking trails together.
         </p>
 
         <a href="#adventures" class="hero-cta">
